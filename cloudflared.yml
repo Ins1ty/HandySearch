@@ -1,0 +1,9 @@
+tunnel: handysearch
+credentials-file: C:\Users\Admin\.cloudflared\credentials.json
+
+ingress:
+  - hostname: handysearch.example.com
+    service: http://localhost:3000
+  - hostname: api.handysearch.example.com  
+    service: http://localhost:8000
+  - service: http_status:404
