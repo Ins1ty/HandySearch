@@ -148,12 +148,15 @@ export default function ContactsPage() {
   });
 
   const sortedContacts = [...filteredContacts].sort((a, b) => {
-    let aVal: any = a[sortBy as keyof Contact] || '';
-    let bVal: any = b[sortBy as keyof Contact] || '';
-    if (sortBy === 'birthday') {
-      aVal = a.birthday || '';
-      bVal = b.birthday || '';
-    }
+    let aVal = '';
+    let bVal = '';
+    
+    if (sortBy === 'name') { aVal = a.name || ''; bVal = b.name || ''; }
+    else if (sortBy === 'region') { aVal = a.region || ''; bVal = b.region || ''; }
+    else if (sortBy === 'birthday') { aVal = a.birthday || ''; bVal = b.birthday || ''; }
+    else if (sortBy === 'created_at') { aVal = a.created_at || ''; bVal = b.created_at || ''; }
+    else { aVal = a.name || ''; bVal = b.name || ''; }
+    
     if (typeof aVal === 'string') aVal = aVal.toLowerCase();
     if (typeof bVal === 'string') bVal = bVal.toLowerCase();
     if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
