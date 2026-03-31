@@ -5,10 +5,27 @@ import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore, useDataStore } from '@/store';
 import { contactsApi, categoriesApi, tagsApi, eventsApi, invitationTypesApi, authApi } from '@/lib/api';
 
+const priorityIcons: Record<string, string> = {
+  call: '📞',
+  sms: '💬',
+  messenger: '✉️',
+  email: '📧',
+};
+
+const priorityLabels: Record<string, string> = {
+  call: 'Звонок',
+  sms: 'СМС',
+  messenger: 'Мессенджер',
+  email: 'Почта',
+};
+
 interface Contact {
   id: number;
   name: string;
   description?: string;
+  is_priest?: boolean;
+  father_name?: string;
+  priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
   email?: string;
   social?: string;
@@ -21,6 +38,8 @@ interface Contact {
   tags?: { id: number; name: string; color: string }[];
   invitation_types?: string;
   required_invitations?: string;
+  postal_address?: string;
+  region?: string;
 }
 
 export default function ContactDetailPage() {
@@ -173,6 +192,17 @@ export default function ContactDetailPage() {
                 )}
               </div>
 
+              {contact.is_priest && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#7c3aed' }}>
+                    👑 Священник
+                  </label>
+                  <div style={{ fontSize: '1.125rem', color: '#7c3aed' }}>
+                    {contact.father_name || 'Священник'}
+                  </div>
+                </div>
+              )}
+
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Категория</label>
                 {editing ? (
@@ -258,6 +288,36 @@ export default function ContactDetailPage() {
                   <div>{contact.description || '-'}</div>
                 )}
               </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Регион</label>
+                {editing ? (
+                  <input
+                    type="text"
+                    value={formData.region || ''}
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                    placeholder="Воронеж, область и т.д."
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                ) : (
+                  <div>{contact.region || '-'}</div>
+                )}
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Почтовый адрес (для писем)</label>
+                {editing ? (
+                  <textarea
+                    value={formData.postal_address || ''}
+                    onChange={(e) => setFormData({ ...formData, postal_address: e.target.value })}
+                    placeholder="Индекс, город, улица, дом, квартира"
+                    rows={2}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                ) : (
+                  <div style={{ whiteSpace: 'pre-wrap' }}>{contact.postal_address || '-'}</div>
+                )}
+              </div>
             </div>
 
             <div>
@@ -290,7 +350,32 @@ export default function ContactDetailPage() {
               </div>
 
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Соцсети</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Приоритетная связь</label>
+                {editing ? (
+                  <select
+                    value={formData.priority_contact || ''}
+                    onChange={(e) => setFormData({ ...formData, priority_contact: e.target.value || null })}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  >
+                    <option value="">Не выбрано</option>
+                    <option value="call">📞 Звонок</option>
+                    <option value="sms">💬 СМС</option>
+                    <option value="messenger">✉️ Мессенджер</option>
+                    <option value="email">📧 Почта</option>
+                  </select>
+                ) : (
+                  <div>
+                    {contact.priority_contact ? (
+                      <span>
+                        {priorityIcons[contact.priority_contact]} {priorityLabels[contact.priority_contact]}
+                      </span>
+                    ) : '-'}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Соцсети / Мессенджеры</label>
                 {editing ? (
                   <input
                     type="text"

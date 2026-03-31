@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\Contact;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -33,6 +34,24 @@ class EventController extends Controller
         $events = $query->orderBy('event_date', 'desc')->get();
 
         return response()->json($events);
+    }
+
+    public function getInvitableContacts(Event $event)
+    {
+        $event->load('invitationType');
+        
+        $query = Contact::with(['category', 'responsible', 'tags']);
+        
+        if ($event->invitationType) {
+            $query->where('invitation_types', 'like', '%' . $event->invitationType->name . '%');
+        }
+        
+        $contacts = $query->orderBy('name')->get();
+
+        return response()->json([
+            'event' => $event,
+            'available_contacts' => $contacts,
+        ]);
     }
 
     public function store(Request $request)

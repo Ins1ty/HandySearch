@@ -5,16 +5,36 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore, useDataStore, useFilterStore } from '@/store';
 import { contactsApi, categoriesApi, tagsApi, responsiblesApi, authApi } from '@/lib/api';
 
+const priorityIcons: Record<string, string> = {
+  call: '📞',
+  sms: '💬',
+  messenger: '✉️',
+  email: '📧',
+};
+
+const priorityLabels: Record<string, string> = {
+  call: 'Звонок',
+  sms: 'СМС',
+  messenger: 'Мессенджер',
+  email: 'Почта',
+};
+
 export default function ContactsPage() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { contacts, categories, tags, responsibles, setContacts, setCategories, setTags, setResponsibles } = useDataStore();
-  const { search, categoryId, tagId, setSearch, setCategoryId, setTagId, resetFilters } = useFilterStore();
+  const { 
+    search, categoryId, tagId, isPriest, region, sortBy, sortOrder,
+    setSearch, setCategoryId, setTagId, setIsPriest, setRegion, setSortBy, setSortOrder, resetFilters 
+  } = useFilterStore();
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newContact, setNewContact] = useState({
     name: '',
     description: '',
+    is_priest: false,
+    father_name: '',
+    priority_contact: '' as '' | 'call' | 'sms' | 'messenger' | 'email',
     phone: '',
     email: '',
     social: '',
@@ -24,6 +44,8 @@ export default function ContactsPage() {
     tags: [] as number[],
     invitation_types: '',
     required_invitations: '',
+    postal_address: '',
+    region: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -70,17 +92,31 @@ export default function ContactsPage() {
     if (!newContact.name) return;
     setSaving(true);
     try {
-      const dataToSend = {
-        ...newContact,
+      const dataToSend: any = {
+        name: newContact.name,
+        description: newContact.description || undefined,
+        is_priest: newContact.is_priest || undefined,
+        father_name: newContact.father_name || undefined,
+        priority_contact: newContact.priority_contact || undefined,
+        phone: newContact.phone || undefined,
+        email: newContact.email || undefined,
+        social: newContact.social || undefined,
+        birthday: newContact.birthday || undefined,
         category_id: newContact.category_id || undefined,
         responsible_id: newContact.responsible_id || undefined,
         tags: newContact.tags.length > 0 ? newContact.tags : undefined,
         invitation_types: newContact.invitation_types || undefined,
         required_invitations: newContact.required_invitations || undefined,
+        postal_address: newContact.postal_address || undefined,
+        region: newContact.region || undefined,
       };
       await contactsApi.create(dataToSend);
       setShowModal(false);
-      setNewContact({ name: '', description: '', phone: '', email: '', social: '', birthday: '', category_id: null, responsible_id: null, tags: [], invitation_types: '', required_invitations: '' });
+      setNewContact({
+        name: '', description: '', is_priest: false, father_name: '', priority_contact: '',
+        phone: '', email: '', social: '', birthday: '', category_id: null, responsible_id: null,
+        tags: [], invitation_types: '', required_invitations: '', postal_address: '', region: ''
+      });
       loadData();
     } catch (error: any) {
       console.error('Error creating contact:', error);
@@ -92,7 +128,8 @@ export default function ContactsPage() {
 
   const filteredContacts = contacts.filter(contact => {
     if (search && !contact.name.toLowerCase().includes(search.toLowerCase()) &&
-        !contact.description?.toLowerCase().includes(search.toLowerCase())) {
+        !contact.description?.toLowerCase().includes(search.toLowerCase()) &&
+        !contact.father_name?.toLowerCase().includes(search.toLowerCase())) {
       return false;
     }
     if (categoryId && contact.category_id !== categoryId) {
@@ -101,7 +138,27 @@ export default function ContactsPage() {
     if (tagId && !contact.tags?.some(t => t.id === tagId)) {
       return false;
     }
+    if (isPriest !== null && contact.is_priest !== isPriest) {
+      return false;
+    }
+    if (region && !contact.region?.toLowerCase().includes(region.toLowerCase())) {
+      return false;
+    }
     return true;
+  });
+
+  const sortedContacts = [...filteredContacts].sort((a, b) => {
+    let aVal: any = a[sortBy as keyof Contact] || '';
+    let bVal: any = b[sortBy as keyof Contact] || '';
+    if (sortBy === 'birthday') {
+      aVal = a.birthday || '';
+      bVal = b.birthday || '';
+    }
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+    if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
   });
 
   if (loading) {
@@ -152,7 +209,7 @@ export default function ContactsPage() {
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <input
               type="text"
-              placeholder="Поиск по имени, описанию, телефону, email..."
+              placeholder="Поиск по имени, описанию, отчеству..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -195,6 +252,65 @@ export default function ContactsPage() {
               {tags.map(tag => (
                 <option key={tag.id} value={tag.id}>{tag.name}</option>
               ))}
+            </select>
+
+            <select
+              value={isPriest === null ? '' : isPriest ? '1' : '0'}
+              onChange={(e) => setIsPriest(e.target.value === '' ? null : e.target.value === '1')}
+              style={{
+                padding: '0.5rem',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '1rem'
+              }}
+            >
+              <option value="">Все</option>
+              <option value="1">Священники</option>
+              <option value="0">Миряне</option>
+            </select>
+
+            <input
+              type="text"
+              placeholder="Регион..."
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              style={{
+                padding: '0.5rem',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '1rem',
+                width: '120px'
+              }}
+            />
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{
+                padding: '0.5rem',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '1rem'
+              }}
+            >
+              <option value="name">По имени</option>
+              <option value="region">По региону</option>
+              <option value="birthday">По дате рождения</option>
+              <option value="created_at">По дате добавления</option>
+            </select>
+
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+              style={{
+                padding: '0.5rem',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '1rem'
+              }}
+            >
+              <option value="asc">↑</option>
+              <option value="desc">↓</option>
             </select>
 
             <button
@@ -262,14 +378,17 @@ export default function ContactsPage() {
           background: 'white', 
           borderRadius: '8px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          overflow: 'hidden'
+          overflow: 'auto'
         }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1000px' }}>
             <thead style={{ background: '#f9fafb' }}>
               <tr>
                 <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Имя</th>
+                <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Священник</th>
                 <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Категория</th>
                 <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Теги</th>
+                <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Связь</th>
+                <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Регион</th>
                 <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Телефон</th>
                 <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Email</th>
                 <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>ДР</th>
@@ -277,14 +396,14 @@ export default function ContactsPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredContacts.length === 0 ? (
+              {sortedContacts.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+                  <td colSpan={10} style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
                     Контакты не найдены
                   </td>
                 </tr>
               ) : (
-                filteredContacts.map(contact => (
+                sortedContacts.map(contact => (
                   <tr 
                     key={contact.id} 
                     style={{ cursor: 'pointer' }}
@@ -297,6 +416,19 @@ export default function ContactsPage() {
                           {contact.description.substring(0, 50)}...
                         </div>
                       )}
+                    </td>
+                    <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
+                      {contact.is_priest ? (
+                        <span style={{ 
+                          background: '#7c3aed20', 
+                          color: '#7c3aed',
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '4px',
+                          fontSize: '0.875rem'
+                        }}>
+                          {contact.father_name || 'Священник'}
+                        </span>
+                      ) : '-'}
                     </td>
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
                       {contact.category && (
@@ -325,6 +457,16 @@ export default function ContactsPage() {
                           </span>
                         ))}
                       </div>
+                    </td>
+                    <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
+                      {contact.priority_contact ? (
+                        <span title={priorityLabels[contact.priority_contact]}>
+                          {priorityIcons[contact.priority_contact]}
+                        </span>
+                      ) : '-'}
+                    </td>
+                    <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
+                      {contact.region || '-'}
                     </td>
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>{contact.phone || '-'}</td>
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>{contact.email || '-'}</td>
@@ -357,7 +499,7 @@ export default function ContactsPage() {
         </div>
 
         <div style={{ marginTop: '1rem', color: '#6b7280' }}>
-          Всего контактов: {filteredContacts.length} / {contacts.length}
+          Всего контактов: {sortedContacts.length} / {contacts.length}
         </div>
       </div>
 
@@ -378,7 +520,7 @@ export default function ContactsPage() {
             background: 'white',
             padding: '2rem',
             borderRadius: '8px',
-            maxWidth: '600px',
+            maxWidth: '700px',
             width: '90%',
             maxHeight: '90vh',
             overflow: 'auto'
@@ -396,6 +538,26 @@ export default function ContactsPage() {
                   onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
                   style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={newContact.is_priest}
+                    onChange={(e) => setNewContact({ ...newContact, is_priest: e.target.checked })}
+                  />
+                  <span style={{ fontWeight: 'bold', color: '#7c3aed' }}>Священник</span>
+                </label>
+                {newContact.is_priest && (
+                  <input
+                    type="text"
+                    placeholder="Имя священника (напр. отец Александр)"
+                    value={newContact.father_name}
+                    onChange={(e) => setNewContact({ ...newContact, father_name: e.target.value })}
+                    style={{ flex: 1, padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                )}
               </div>
 
               <div>
@@ -487,22 +649,60 @@ export default function ContactsPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Соцсети</label>
+                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Приоритетная связь</label>
+                <select
+                  value={newContact.priority_contact}
+                  onChange={(e) => setNewContact({ ...newContact, priority_contact: e.target.value as any })}
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                >
+                  <option value="">Не выбрано</option>
+                  <option value="call">📞 Звонок</option>
+                  <option value="sms">💬 СМС</option>
+                  <option value="messenger">✉️ Мессенджер</option>
+                  <option value="email">📧 Почта</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Соцсети / Мессенджеры</label>
                 <input
                   type="text"
                   value={newContact.social}
                   onChange={(e) => setNewContact({ ...newContact, social: e.target.value })}
-                  placeholder="Telegram, VK, etc."
+                  placeholder="Telegram, VK, WhatsApp и т.д."
                   style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>
 
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Дата рождения</label>
+                  <input
+                    type="date"
+                    value={newContact.birthday}
+                    onChange={(e) => setNewContact({ ...newContact, birthday: e.target.value })}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Регион</label>
+                  <input
+                    type="text"
+                    value={newContact.region}
+                    onChange={(e) => setNewContact({ ...newContact, region: e.target.value })}
+                    placeholder="Воронеж, область и т.д."
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+              </div>
+
               <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Дата рождения</label>
-                <input
-                  type="date"
-                  value={newContact.birthday}
-                  onChange={(e) => setNewContact({ ...newContact, birthday: e.target.value })}
+                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Почтовый адрес (для писем)</label>
+                <textarea
+                  value={newContact.postal_address}
+                  onChange={(e) => setNewContact({ ...newContact, postal_address: e.target.value })}
+                  placeholder="Индекс, город, улица, дом, квартира"
+                  rows={2}
                   style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
               </div>

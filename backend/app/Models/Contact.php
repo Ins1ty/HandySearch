@@ -10,6 +10,9 @@ class Contact extends Model
     protected $fillable = [
         'name',
         'description',
+        'is_priest',
+        'father_name',
+        'priority_contact',
         'phone',
         'email',
         'social',
@@ -18,10 +21,13 @@ class Contact extends Model
         'category_id',
         'invitation_types',
         'required_invitations',
+        'postal_address',
+        'region',
     ];
 
     protected $casts = [
         'birthday' => 'date',
+        'is_priest' => 'boolean',
     ];
 
     public function responsible()

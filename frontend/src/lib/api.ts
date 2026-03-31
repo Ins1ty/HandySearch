@@ -58,6 +58,7 @@ export const eventsApi = {
   create: (data: any) => api.post('/events', data),
   update: (id: number, data: any) => api.put(`/events/${id}`, data),
   delete: (id: number) => api.delete(`/events/${id}`),
+  getInvitableContacts: (id: number) => api.get(`/events/${id}/invitable-contacts`),
 };
 
 export const giftsApi = {

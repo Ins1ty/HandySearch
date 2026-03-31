@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('gifts', GiftController::class);
     Route::apiResource('contacts', ContactController::class);
     Route::apiResource('events', EventController::class);
+    Route::get('/events/{event}/invitable-contacts', [EventController::class, 'getInvitableContacts']);
     Route::apiResource('users', UserController::class)->except(['show']);
     Route::apiResource('responsibles', ResponsibleController::class)->except(['show']);
 });

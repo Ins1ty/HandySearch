@@ -9,3 +9,4 @@ vendor/
 cloudflared.exe
 ngrok.exe
 ngrok.zip
+/backend/database/database.sqlite

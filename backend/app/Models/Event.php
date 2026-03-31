@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
-    protected $fillable = ['title', 'description', 'event_date', 'invitation_type_id'];
+    protected $fillable = ['title', 'description', 'event_date', 'invitation_type_id', 'is_regular'];
 
     protected $casts = [
         'event_date' => 'datetime',
+        'is_regular' => 'boolean',
     ];
 
     public function invitationType()

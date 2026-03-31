@@ -12,6 +12,7 @@ interface Event {
   event_date: string;
   invitation_type_id?: number;
   invitation_type?: { id: number; name: string; color: string };
+  is_regular?: boolean;
   contacts?: Contact[];
   gifts?: Gift[];
 }
@@ -41,6 +42,9 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [invitableContacts, setInvitableContacts] = useState<Contact[]>([]);
+  const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
@@ -78,6 +82,15 @@ export default function EventDetailPage() {
     }
   };
 
+  const loadInvitableContacts = async () => {
+    try {
+      const res = await eventsApi.getInvitableContacts(Number(params.id));
+      setInvitableContacts(res.data.available_contacts);
+    } catch (error) {
+      console.error('Error loading invitable contacts:', error);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await authApi.logout();
@@ -104,6 +117,26 @@ export default function EventDetailPage() {
     } catch (error) {
       console.error('Error deleting event:', error);
     }
+  };
+
+  const handleInvite = async () => {
+    try {
+      await eventsApi.update(Number(params.id), {
+        ...formData,
+        contacts: selectedContacts,
+      });
+      setShowInviteModal(false);
+      setSelectedContacts([]);
+      loadData();
+    } catch (error) {
+      console.error('Error inviting contacts:', error);
+    }
+  };
+
+  const openInviteModal = async () => {
+    await loadInvitableContacts();
+    setSelectedContacts(event?.contacts?.map(c => c.id) || []);
+    setShowInviteModal(true);
   };
 
   if (loading || !event) {
@@ -235,6 +268,21 @@ export default function EventDetailPage() {
                   ) : '-'
                 )}
               </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  {editing ? (
+                    <input
+                      type="checkbox"
+                      checked={formData.is_regular || false}
+                      onChange={(e) => setFormData({ ...formData, is_regular: e.target.checked })}
+                    />
+                  ) : (
+                    event.is_regular ? '✅' : '⬜'
+                  )}
+                  <span style={{ fontWeight: 'bold' }}>Регулярное событие</span>
+                </label>
+              </div>
             </div>
 
             <div>
@@ -327,9 +375,26 @@ export default function EventDetailPage() {
           borderRadius: '8px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-            Участники ({event.contacts?.length || 0})
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+              Участники ({event.contacts?.length || 0})
+            </h2>
+            {canEdit && (
+              <button
+                onClick={openInviteModal}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                + Пригласить участников
+              </button>
+            )}
+          </div>
           
           {event.contacts && event.contacts.length > 0 ? (
             <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
@@ -392,6 +457,137 @@ export default function EventDetailPage() {
           )}
         </div>
       </div>
+
+      {showInviteModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '2rem',
+            borderRadius: '8px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'auto'
+          }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+              Пригласить участников
+            </h2>
+            <p style={{ marginBottom: '1rem', color: '#6b7280' }}>
+              Выберите контактов, которые могут быть приглашены на это событие
+              {event.invitation_type && (
+                <span> (тип: <strong>{event.invitation_type.name}</strong>)</span>
+              )}
+            </p>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <input
+                type="text"
+                placeholder="Поиск по имени..."
+                onChange={(e) => {
+                  const search = e.target.value.toLowerCase();
+                  const filtered = contacts.filter((c: any) => 
+                    c.name.toLowerCase().includes(search)
+                  );
+                }}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+              />
+            </div>
+
+            <div style={{ maxHeight: '400px', overflow: 'auto', marginBottom: '1rem' }}>
+              {invitableContacts.length === 0 ? (
+                <div style={{ color: '#6b7280', textAlign: 'center', padding: '2rem' }}>
+                  Нет доступных контактов для приглашения
+                </div>
+              ) : (
+                invitableContacts.map(contact => (
+                  <label 
+                    key={contact.id}
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem', 
+                      padding: '0.5rem',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #f3f4f6'
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedContacts.includes(contact.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedContacts([...selectedContacts, contact.id]);
+                        } else {
+                          setSelectedContacts(selectedContacts.filter(id => id !== contact.id));
+                        }
+                      }}
+                    />
+                    <div>
+                      <div>{contact.name}</div>
+                      {contact.category && (
+                        <span style={{ 
+                          fontSize: '0.75rem',
+                          background: contact.category.color + '20', 
+                          color: contact.category.color,
+                          padding: '0.125rem 0.375rem',
+                          borderRadius: '4px'
+                        }}>
+                          {contact.category.name}
+                        </span>
+                      )}
+                    </div>
+                  </label>
+                ))
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowInviteModal(false)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Отмена
+              </button>
+              <button
+                onClick={handleInvite}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Пригласить ({selectedContacts.length})
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

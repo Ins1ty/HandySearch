@@ -26,17 +26,35 @@ class ContactController extends Controller
             });
         }
 
+        if ($request->has('is_priest')) {
+            $query->where('is_priest', $request->boolean('is_priest'));
+        }
+
+        if ($request->has('region')) {
+            $query->where('region', 'like', "%{$request->region}%");
+        }
+
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('father_name', 'like', "%{$search}%");
             });
         }
 
-        $contacts = $query->orderBy('name')->get();
+        $sortBy = $request->get('sort_by', 'name');
+        $sortOrder = $request->get('sort_order', 'asc');
+        
+        if (in_array($sortBy, ['name', 'region', 'birthday', 'created_at'])) {
+            $query->orderBy($sortBy, $sortOrder === 'desc' ? 'desc' : 'asc');
+        } else {
+            $query->orderBy('name');
+        }
+
+        $contacts = $query->get();
 
         return response()->json($contacts);
     }
@@ -46,6 +64,9 @@ class ContactController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'is_priest' => 'nullable|boolean',
+            'father_name' => 'nullable|string|max:255',
+            'priority_contact' => 'nullable|in:call,sms,messenger,email',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'social' => 'nullable|string',
@@ -54,6 +75,8 @@ class ContactController extends Controller
             'category_id' => 'nullable|exists:categories,id',
             'invitation_types' => 'nullable|string',
             'required_invitations' => 'nullable|string',
+            'postal_address' => 'nullable|string',
+            'region' => 'nullable|string|max:255',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
         ]);
@@ -81,6 +104,9 @@ class ContactController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
+            'is_priest' => 'nullable|boolean',
+            'father_name' => 'nullable|string|max:255',
+            'priority_contact' => 'nullable|in:call,sms,messenger,email',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'social' => 'nullable|string',
@@ -89,6 +115,8 @@ class ContactController extends Controller
             'category_id' => 'nullable|exists:categories,id',
             'invitation_types' => 'nullable|string',
             'required_invitations' => 'nullable|string',
+            'postal_address' => 'nullable|string',
+            'region' => 'nullable|string|max:255',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
         ]);
