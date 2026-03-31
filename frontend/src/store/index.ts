@@ -62,6 +62,8 @@ interface Contact {
   required_invitations?: string;
   postal_address?: string;
   region?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface Category {
