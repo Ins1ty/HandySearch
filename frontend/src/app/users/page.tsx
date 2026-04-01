@@ -150,34 +150,7 @@ export default function UsersPage() {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button
-              onClick={() => router.push('/contacts')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Контакты
-            </button>
-            <button
-              onClick={() => router.push('/events')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#8b5cf6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              События
-            </button>
-          </div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Пользователи</h2>
 
           {user?.role === 'admin' && (
             <button
