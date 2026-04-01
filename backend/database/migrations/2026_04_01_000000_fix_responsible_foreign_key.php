@@ -3,21 +3,24 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        DB::statement('ALTER TABLE contacts DROP FOREIGN KEY contacts_responsible_id_foreign');
+        
         Schema::table('contacts', function (Blueprint $table) {
-            $table->dropForeign(['responsible_id']);
             $table->foreignId('responsible_id')->nullable()->constrained('responsibles')->nullOnDelete();
         });
     }
 
     public function down(): void
     {
+        DB::statement('ALTER TABLE contacts DROP FOREIGN KEY contacts_responsible_id_foreign');
+        
         Schema::table('contacts', function (Blueprint $table) {
-            $table->dropForeign(['responsible_id']);
             $table->foreignId('responsible_id')->nullable()->constrained('users')->nullOnDelete();
         });
     }
