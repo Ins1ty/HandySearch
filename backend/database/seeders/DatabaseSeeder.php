@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\InvitationType;
+use App\Models\Responsible;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -77,6 +78,14 @@ class DatabaseSeeder extends Seeder
 
         foreach ($invitationTypes as $type) {
             InvitationType::create($type);
+        }
+
+        $responsibles = [
+            ['name' => 'Основной ответственный', 'phone' => '+79001234567', 'email' => 'responsible@handysearch.local'],
+        ];
+
+        foreach ($responsibles as $resp) {
+            Responsible::firstOrCreate(['name' => $resp['name']], $resp);
         }
     }
 }
