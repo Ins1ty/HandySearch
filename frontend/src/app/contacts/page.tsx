@@ -213,45 +213,21 @@ export default function ContactsPage() {
           alignItems: 'center'
         }}>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button
-              onClick={() => router.push('/users')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#6b7280',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Пользователи
-            </button>
-            <button
-              onClick={() => router.push('/contacts')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Контакты
-            </button>
-            <button
-              onClick={() => router.push('/events')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#8b5cf6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              События
-            </button>
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => router.push('/users')}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Пользователи
+              </button>
+            )}
           </div>
         </div>
 

@@ -170,47 +170,21 @@ export default function EventsPage() {
               ))}
             </select>
 
-            <button
-              onClick={() => router.push('/users')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#6b7280',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Пользователи
-            </button>
-
-            <button
-              onClick={() => router.push('/contacts')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Контакты
-            </button>
-
-            <button
-              onClick={() => router.push('/responsibles')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#ec4899',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Ответственные
-            </button>
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => router.push('/users')}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Пользователи
+              </button>
+            )}
 
             {user?.role !== 'viewer' && (
               <button
