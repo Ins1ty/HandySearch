@@ -207,6 +207,59 @@ export default function ContactsPage() {
           padding: '1.5rem', 
           borderRadius: '8px',
           marginBottom: '1.5rem',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={() => router.push('/users')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Пользователи
+            </button>
+            <button
+              onClick={() => router.push('/contacts')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Контакты
+            </button>
+            <button
+              onClick={() => router.push('/events')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#8b5cf6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              События
+            </button>
+          </div>
+        </div>
+
+        <div style={{ 
+          background: 'white', 
+          padding: '1.5rem', 
+          borderRadius: '8px',
+          marginBottom: '1.5rem',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>

@@ -171,6 +171,20 @@ export default function EventsPage() {
             </select>
 
             <button
+              onClick={() => router.push('/users')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Пользователи
+            </button>
+
+            <button
               onClick={() => router.push('/contacts')}
               style={{
                 padding: '0.5rem 1rem',
