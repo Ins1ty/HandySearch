@@ -14,6 +14,18 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
+Route::get('/seed-admin', function () {
+    $user = \App\Models\User::firstOrCreate(
+        ['email' => 'admin@handysearch.local'],
+        [
+            'name' => 'Admin',
+            'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+            'role' => 'admin',
+        ]
+    );
+    return response()->json(['user' => $user, 'message' => 'Admin created or already exists']);
+});
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
