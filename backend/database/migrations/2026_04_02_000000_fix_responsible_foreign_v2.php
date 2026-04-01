@@ -9,19 +9,26 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('ALTER TABLE contacts DROP FOREIGN KEY contacts_responsible_id_foreign');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
         
         Schema::table('contacts', function (Blueprint $table) {
-            $table->foreignId('responsible_id')->nullable()->constrained('responsibles')->nullOnDelete();
+            $table->dropForeign(['responsible_id']);
+            $table->unsignedBigInteger('responsible_id')->nullable()->change();
+            $table->foreign('responsible_id')->references('id')->on('responsibles')->nullOnDelete();
         });
+        
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 
     public function down(): void
     {
-        DB::statement('ALTER TABLE contacts DROP FOREIGN KEY contacts_responsible_id_foreign');
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
         
         Schema::table('contacts', function (Blueprint $table) {
+            $table->dropForeign(['responsible_id']);
             $table->foreignId('responsible_id')->nullable()->constrained('users')->nullOnDelete();
         });
+        
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 };
