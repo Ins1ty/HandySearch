@@ -15,26 +15,32 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        $admin = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@handysearch.local',
-            'password' => Hash::make('admin123'),
-            'role' => 'admin',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@handysearch.local'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+            ]
+        );
 
-        User::create([
-            'name' => 'Editor',
-            'email' => 'editor@handysearch.local',
-            'password' => Hash::make('editor123'),
-            'role' => 'editor',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'editor@handysearch.local'],
+            [
+                'name' => 'Editor',
+                'password' => Hash::make('editor123'),
+                'role' => 'editor',
+            ]
+        );
 
-        User::create([
-            'name' => 'Viewer',
-            'email' => 'viewer@handysearch.local',
-            'password' => Hash::make('viewer123'),
-            'role' => 'viewer',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'viewer@handysearch.local'],
+            [
+                'name' => 'Viewer',
+                'password' => Hash::make('viewer123'),
+                'role' => 'viewer',
+            ]
+        );
 
         $categories = [
             ['name' => 'Культура', 'color' => '#ec4899'],
