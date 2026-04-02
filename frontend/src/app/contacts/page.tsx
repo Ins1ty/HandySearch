@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, useDataStore, useFilterStore } from '@/store';
-import { contactsApi, categoriesApi, tagsApi, responsiblesApi, authApi } from '@/lib/api';
+import { contactsApi, categoriesApi, tagsApi, responsiblesApi, authApi, eventsApi } from '@/lib/api';
 
 const priorityIcons: Record<string, string> = {
   call: '📞',
@@ -22,7 +22,7 @@ const priorityLabels: Record<string, string> = {
 export default function ContactsPage() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { contacts, categories, tags, responsibles, setContacts, setCategories, setTags, setResponsibles } = useDataStore();
+  const { contacts, categories, tags, responsibles, events, setContacts, setCategories, setTags, setResponsibles, setEvents } = useDataStore();
   const { 
     search, categoryId, tagId, region, sortBy, sortOrder,
     setSearch, setCategoryId, setTagId, setRegion, setSortBy, setSortOrder, resetFilters 
@@ -57,16 +57,18 @@ export default function ContactsPage() {
 
   const loadData = async () => {
     try {
-      const [contactsRes, categoriesRes, tagsRes, responsiblesRes] = await Promise.all([
+      const [contactsRes, categoriesRes, tagsRes, responsiblesRes, eventsRes] = await Promise.all([
         contactsApi.getAll(),
         categoriesApi.getAll(),
         tagsApi.getAll(),
         responsiblesApi.getAll(),
+        eventsApi.getAll(),
       ]);
       setContacts(contactsRes.data);
       setCategories(categoriesRes.data);
       setTags(tagsRes.data);
       setResponsibles(responsiblesRes.data);
+      setEvents(eventsRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
       if (error === 'Unauthorized') {
@@ -683,25 +685,37 @@ export default function ContactsPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Куда приглашать</label>
-                <textarea
-                  value={newContact.invitation_types}
-                  onChange={(e) => setNewContact({ ...newContact, invitation_types: e.target.value })}
-                  placeholder="К какой группе относится, куда звать"
-                  rows={2}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                />
+                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Приглашать на события</label>
+                <select
+                  multiple
+                  value={newContact.invitation_types ? newContact.invitation_types.split(',') : []}
+                  onChange={(e) => {
+                    const selected = Array.from(e.target.selectedOptions, option => option.value);
+                    setNewContact({ ...newContact, invitation_types: selected.join(',') });
+                  }}
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', height: '100px' }}
+                >
+                  {events.map(event => (
+                    <option key={event.id} value={event.title}>{event.title}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Обязательные приглашения</label>
-                <textarea
-                  value={newContact.required_invitations}
-                  onChange={(e) => setNewContact({ ...newContact, required_invitations: e.target.value })}
-                  placeholder="На какие события обязательно приглашать"
-                  rows={2}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                />
+                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Обязательные события</label>
+                <select
+                  multiple
+                  value={newContact.required_invitations ? newContact.required_invitations.split(',') : []}
+                  onChange={(e) => {
+                    const selected = Array.from(e.target.selectedOptions, option => option.value);
+                    setNewContact({ ...newContact, required_invitations: selected.join(',') });
+                  }}
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', height: '100px' }}
+                >
+                  {events.map(event => (
+                    <option key={event.id} value={event.title}>{event.title}</option>
+                  ))}
+                </select>
               </div>
             </div>
 

@@ -49,6 +49,7 @@ export default function ContactDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState<any>({});
+  const [allEvents, setAllEvents] = useState<any[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -60,11 +61,12 @@ export default function ContactDetailPage() {
 
   const loadData = async () => {
     try {
-      const [contactRes, categoriesRes, tagsRes, eventsRes, typesRes] = await Promise.all([
+      const [contactRes, categoriesRes, tagsRes, eventsRes, allEventsRes, typesRes] = await Promise.all([
         contactsApi.getOne(Number(params.id)),
         categoriesApi.getAll(),
         tagsApi.getAll(),
         eventsApi.getAll({ contact_id: String(params.id) }),
+        eventsApi.getAll(),
         invitationTypesApi.getAll(),
       ]);
       setContact(contactRes.data);
@@ -75,6 +77,7 @@ export default function ContactDetailPage() {
       setCategories(categoriesRes.data);
       setTags(tagsRes.data);
       setEvents(eventsRes.data);
+      setAllEvents(allEventsRes.data);
       setInvitationTypes(typesRes.data);
     } catch (error) {
       console.error('Error loading contact:', error);
@@ -415,13 +418,19 @@ export default function ContactDetailPage() {
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Куда приглашать</label>
                 {editing ? (
-                  <textarea
-                    value={formData.invitation_types || ''}
-                    onChange={(e) => setFormData({ ...formData, invitation_types: e.target.value })}
-                    rows={2}
-                    placeholder="Куда звать, к какой группе относится"
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
+                  <select
+                    multiple
+                    value={formData.invitation_types ? formData.invitation_types.split(',') : []}
+                    onChange={(e) => {
+                      const selected = Array.from(e.target.selectedOptions, option => option.value);
+                      setFormData({ ...formData, invitation_types: selected.join(',') });
+                    }}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', height: '100px' }}
+                  >
+                    {allEvents.map(event => (
+                      <option key={event.id} value={event.title}>{event.title}</option>
+                    ))}
+                  </select>
                 ) : (
                   <div>{contact.invitation_types || '-'}</div>
                 )}
@@ -430,13 +439,19 @@ export default function ContactDetailPage() {
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Обязательные приглашения</label>
                 {editing ? (
-                  <textarea
-                    value={formData.required_invitations || ''}
-                    onChange={(e) => setFormData({ ...formData, required_invitations: e.target.value })}
-                    rows={2}
-                    placeholder="На какие события ждёт приглашение"
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
+                  <select
+                    multiple
+                    value={formData.required_invitations ? formData.required_invitations.split(',') : []}
+                    onChange={(e) => {
+                      const selected = Array.from(e.target.selectedOptions, option => option.value);
+                      setFormData({ ...formData, required_invitations: selected.join(',') });
+                    }}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', height: '100px' }}
+                  >
+                    {allEvents.map(event => (
+                      <option key={event.id} value={event.title}>{event.title}</option>
+                    ))}
+                  </select>
                 ) : (
                   <div>{contact.required_invitations || '-'}</div>
                 )}
