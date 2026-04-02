@@ -62,6 +62,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Эксперт', 'color' => '#8b5cf6'],
             ['name' => 'Партнёр', 'color' => '#10b981'],
             ['name' => 'Благотворитель', 'color' => '#f59e0b'],
+            ['name' => 'Священник', 'color' => '#7c3aed'],
         ];
 
         foreach ($tags as $tag) {

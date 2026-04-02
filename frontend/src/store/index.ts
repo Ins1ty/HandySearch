@@ -45,8 +45,6 @@ interface Contact {
   id: number;
   name: string;
   description?: string;
-  is_priest?: boolean;
-  father_name?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
   email?: string;
@@ -148,7 +146,6 @@ interface FilterState {
   categoryId: number | null;
   tagId: number | null;
   responsibleId: number | null;
-  isPriest: boolean | null;
   region: string;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
@@ -156,7 +153,6 @@ interface FilterState {
   setCategoryId: (id: number | null) => void;
   setTagId: (id: number | null) => void;
   setResponsibleId: (id: number | null) => void;
-  setIsPriest: (value: boolean | null) => void;
   setRegion: (region: string) => void;
   setSortBy: (sortBy: string) => void;
   setSortOrder: (order: 'asc' | 'desc') => void;
@@ -168,7 +164,6 @@ export const useFilterStore = create<FilterState>((set) => ({
   categoryId: null,
   tagId: null,
   responsibleId: null,
-  isPriest: null,
   region: '',
   sortBy: 'name',
   sortOrder: 'asc',
@@ -176,7 +171,6 @@ export const useFilterStore = create<FilterState>((set) => ({
   setCategoryId: (categoryId) => set({ categoryId }),
   setTagId: (tagId) => set({ tagId }),
   setResponsibleId: (responsibleId) => set({ responsibleId }),
-  setIsPriest: (isPriest) => set({ isPriest }),
   setRegion: (region) => set({ region }),
   setSortBy: (sortBy) => set({ sortBy }),
   setSortOrder: (sortOrder) => set({ sortOrder }),

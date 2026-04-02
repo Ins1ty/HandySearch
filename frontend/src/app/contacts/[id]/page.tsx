@@ -23,8 +23,6 @@ interface Contact {
   id: number;
   name: string;
   description?: string;
-  is_priest?: boolean;
-  father_name?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
   email?: string;
@@ -191,17 +189,6 @@ export default function ContactDetailPage() {
                   <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{contact.name}</div>
                 )}
               </div>
-
-              {contact.is_priest && (
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#7c3aed' }}>
-                    👑 Священник
-                  </label>
-                  <div style={{ fontSize: '1.125rem', color: '#7c3aed' }}>
-                    {contact.father_name || 'Священник'}
-                  </div>
-                </div>
-              )}
 
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Категория</label>

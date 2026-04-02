@@ -24,16 +24,14 @@ export default function ContactsPage() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { contacts, categories, tags, responsibles, setContacts, setCategories, setTags, setResponsibles } = useDataStore();
   const { 
-    search, categoryId, tagId, isPriest, region, sortBy, sortOrder,
-    setSearch, setCategoryId, setTagId, setIsPriest, setRegion, setSortBy, setSortOrder, resetFilters 
+    search, categoryId, tagId, region, sortBy, sortOrder,
+    setSearch, setCategoryId, setTagId, setRegion, setSortBy, setSortOrder, resetFilters 
   } = useFilterStore();
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newContact, setNewContact] = useState({
     name: '',
     description: '',
-    is_priest: false,
-    father_name: '',
     priority_contact: '' as '' | 'call' | 'sms' | 'messenger' | 'email',
     phone: '',
     email: '',
@@ -95,8 +93,6 @@ export default function ContactsPage() {
       const dataToSend: any = {
         name: newContact.name,
         description: newContact.description || undefined,
-        is_priest: newContact.is_priest || undefined,
-        father_name: newContact.father_name || undefined,
         priority_contact: newContact.priority_contact || undefined,
         phone: newContact.phone || undefined,
         email: newContact.email || undefined,
@@ -113,7 +109,7 @@ export default function ContactsPage() {
       await contactsApi.create(dataToSend);
       setShowModal(false);
       setNewContact({
-        name: '', description: '', is_priest: false, father_name: '', priority_contact: '',
+        name: '', description: '', priority_contact: '',
         phone: '', email: '', social: '', birthday: '', category_id: null, responsible_id: null,
         tags: [], invitation_types: '', required_invitations: '', postal_address: '', region: ''
       });
@@ -128,17 +124,13 @@ export default function ContactsPage() {
 
   const filteredContacts = contacts.filter(contact => {
     if (search && !contact.name.toLowerCase().includes(search.toLowerCase()) &&
-        !contact.description?.toLowerCase().includes(search.toLowerCase()) &&
-        !contact.father_name?.toLowerCase().includes(search.toLowerCase())) {
+        !contact.description?.toLowerCase().includes(search.toLowerCase())) {
       return false;
     }
     if (categoryId && contact.category_id !== categoryId) {
       return false;
     }
     if (tagId && !contact.tags?.some(t => t.id === tagId)) {
-      return false;
-    }
-    if (isPriest !== null && contact.is_priest !== isPriest) {
       return false;
     }
     if (region && !contact.region?.toLowerCase().includes(region.toLowerCase())) {
@@ -284,21 +276,6 @@ export default function ContactsPage() {
               {tags.map(tag => (
                 <option key={tag.id} value={tag.id}>{tag.name}</option>
               ))}
-            </select>
-
-            <select
-              value={isPriest === null ? '' : isPriest ? '1' : '0'}
-              onChange={(e) => setIsPriest(e.target.value === '' ? null : e.target.value === '1')}
-              style={{
-                padding: '0.5rem',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '1rem'
-              }}
-            >
-              <option value="">Все</option>
-              <option value="1">Священники</option>
-              <option value="0">Миряне</option>
             </select>
 
             <input
@@ -450,19 +427,6 @@ export default function ContactsPage() {
                       )}
                     </td>
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
-                      {contact.is_priest ? (
-                        <span style={{ 
-                          background: '#7c3aed20', 
-                          color: '#7c3aed',
-                          padding: '0.25rem 0.5rem',
-                          borderRadius: '4px',
-                          fontSize: '0.875rem'
-                        }}>
-                          {contact.father_name || 'Священник'}
-                        </span>
-                      ) : '-'}
-                    </td>
-                    <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
                       {contact.category && (
                         <span style={{ 
                           background: contact.category.color + '20', 
@@ -570,26 +534,6 @@ export default function ContactsPage() {
                   onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
                   style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                 />
-              </div>
-
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={newContact.is_priest}
-                    onChange={(e) => setNewContact({ ...newContact, is_priest: e.target.checked })}
-                  />
-                  <span style={{ fontWeight: 'bold', color: '#7c3aed' }}>Священник</span>
-                </label>
-                {newContact.is_priest && (
-                  <input
-                    type="text"
-                    placeholder="Имя священника (напр. отец Александр)"
-                    value={newContact.father_name}
-                    onChange={(e) => setNewContact({ ...newContact, father_name: e.target.value })}
-                    style={{ flex: 1, padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
-                )}
               </div>
 
               <div>
