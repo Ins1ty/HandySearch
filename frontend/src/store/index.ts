@@ -179,7 +179,6 @@ export const useFilterStore = create<FilterState>((set) => ({
     categoryId: null, 
     tagId: null, 
     responsibleId: null,
-    isPriest: null,
     region: '',
     sortBy: 'name',
     sortOrder: 'asc',
