@@ -1,0 +1,166 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": "Admin",
+            "email": "admin@handysearch.local",
+            "email_verified_at": null,
+            "password": "$2y$12$4BPHluNLjUenDHBJvDRKzu78RXnGDNCzIimwKfRRr1vYw5kn\/kSYm",
+            "remember_token": null,
+            "created_at": "2026-04-02 09:24:16",
+            "updated_at": "2026-04-02 09:24:16",
+            "role": "admin"
+        },
+        {
+            "id": 2,
+            "name": "Editor",
+            "email": "editor@handysearch.local",
+            "email_verified_at": null,
+            "password": "$2y$12$tl0Ejo1LJNhAex1pcBbXeu.7DHKJmKu0.e3.54C\/rX1KvCK9i31Ca",
+            "remember_token": null,
+            "created_at": "2026-04-02 09:24:16",
+            "updated_at": "2026-04-02 09:24:16",
+            "role": "editor"
+        },
+        {
+            "id": 3,
+            "name": "Viewer",
+            "email": "viewer@handysearch.local",
+            "email_verified_at": null,
+            "password": "$2y$12$Nqm\/0fZ7YqRoWYoaMO5cSeaDCt7lzasyKobOz979fB9i8KvYbGpBi",
+            "remember_token": null,
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17",
+            "role": "viewer"
+        }
+    ],
+    "categories": [
+        {
+            "id": 1,
+            "name": "Культура",
+            "color": "#ec4899",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 2,
+            "name": "История",
+            "color": "#8b5cf6",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 3,
+            "name": "Русский университет",
+            "color": "#3b82f6",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 4,
+            "name": "Священнослужители",
+            "color": "#f59e0b",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 5,
+            "name": "Спонсоры",
+            "color": "#10b981",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 6,
+            "name": "Образование",
+            "color": "#06b6d4",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 7,
+            "name": "Наука",
+            "color": "#ef4444",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        }
+    ],
+    "tags": [
+        {
+            "id": 1,
+            "name": "Друг",
+            "color": "#3b82f6",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 2,
+            "name": "Эксперт",
+            "color": "#8b5cf6",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 3,
+            "name": "Партнёр",
+            "color": "#10b981",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 4,
+            "name": "Благотворитель",
+            "color": "#f59e0b",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        }
+    ],
+    "invitation_types": [
+        {
+            "id": 1,
+            "name": "Конференция",
+            "color": "#3b82f6",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 2,
+            "name": "Ужин",
+            "color": "#10b981",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 3,
+            "name": "Встреча",
+            "color": "#8b5cf6",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 4,
+            "name": "Презентация",
+            "color": "#f59e0b",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        },
+        {
+            "id": 5,
+            "name": "Юбилей",
+            "color": "#ec4899",
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        }
+    ],
+    "responsibles": [
+        {
+            "id": 1,
+            "name": "Основной ответственный",
+            "phone": "+79001234567",
+            "email": "responsible@handysearch.local",
+            "notes": null,
+            "created_at": "2026-04-02 09:24:17",
+            "updated_at": "2026-04-02 09:24:17"
+        }
+    ]
+}
