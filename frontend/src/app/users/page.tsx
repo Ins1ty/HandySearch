@@ -114,24 +114,71 @@ export default function UsersPage() {
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
       <header style={{ 
         background: 'white', 
-        padding: '1rem 2rem', 
+        padding: '1rem', 
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '0.5rem'
       }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>HandySearch - Пользователи</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span>{user?.name} ({user?.role})</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Пользователи</h1>
+          <button
+            onClick={() => router.push('/contacts')}
+            style={{
+              padding: '0.5rem',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Конт.
+          </button>
+          <button
+            onClick={() => router.push('/events')}
+            style={{
+              padding: '0.5rem',
+              background: '#8b5cf6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            События
+          </button>
+          <button
+            onClick={() => router.push('/responsibles')}
+            style={{
+              padding: '0.5rem',
+              background: '#ec4899',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Ответств.
+          </button>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>
           <button 
             onClick={handleLogout}
             style={{
-              padding: '0.5rem 1rem',
+              padding: '0.5rem',
               background: '#ef4444',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: '0.875rem'
             }}
           >
             Выйти
@@ -139,7 +186,26 @@ export default function UsersPage() {
         </div>
       </header>
 
-      <div style={{ padding: '2rem' }}>
+      <div style={{ padding: '1rem' }}>
+        {user?.role === 'admin' && (
+          <button
+            onClick={openAdd}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              background: '#10b981',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              marginBottom: '1rem'
+            }}
+          >
+            + Добавить пользователя
+          </button>
+        )}
+
         <div style={{ 
           background: 'white', 
           padding: '1.5rem', 
