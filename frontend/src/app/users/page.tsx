@@ -208,31 +208,12 @@ export default function UsersPage() {
 
         <div style={{ 
           background: 'white', 
-          padding: '1.5rem', 
+          padding: '1rem', 
           borderRadius: '8px',
-          marginBottom: '1.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          marginBottom: '1rem',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Пользователи</h2>
-
-          {user?.role === 'admin' && (
-            <button
-              onClick={openAdd}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#10b981',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              + Добавить пользователя
-            </button>
-          )}
         </div>
 
         <div style={{ 
