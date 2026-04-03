@@ -332,14 +332,62 @@ export default function UsersPage() {
         }}>
           <div style={{
             background: 'white',
-            padding: '2rem',
+            padding: '1.5rem',
             borderRadius: '8px',
             maxWidth: '500px',
-            width: '90%'
+            width: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
           }}>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
-              {editingUser ? 'Изменить пользователя' : 'Добавить пользователя'}
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
+                {editingUser ? 'Изменить пользователя' : 'Добавить пользователя'}
+              </h2>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={() => router.push('/contacts')}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    background: '#3b82f6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem'
+                  }}
+                >
+                  Конт.
+                </button>
+                <button
+                  onClick={() => router.push('/events')}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    background: '#8b5cf6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem'
+                  }}
+                >
+                  События
+                </button>
+                <button
+                  onClick={() => router.push('/responsibles')}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    background: '#ec4899',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem'
+                  }}
+                >
+                  Ответств.
+                </button>
+              </div>
+            </div>
             
             <div style={{ display: 'grid', gap: '1rem' }}>
               <div>
