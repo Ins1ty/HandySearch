@@ -170,43 +170,73 @@ export default function ContactsPage() {
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
       <header style={{ 
         background: 'white', 
-        padding: '1rem 2rem', 
+        padding: '1rem', 
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '1rem'
+        gap: '0.5rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>HandySearch</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button
+            onClick={() => router.push('/events')}
+            style={{
+              padding: '0.5rem',
+              background: '#8b5cf6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            События
+          </button>
+          <button
+            onClick={() => router.push('/responsibles')}
+            style={{
+              padding: '0.5rem',
+              background: '#ec4899',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Ответств.
+          </button>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Контакты</h1>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>
           {user?.role === 'admin' && (
             <button
               onClick={() => router.push('/users')}
               style={{
-                padding: '0.5rem 1rem',
+                padding: '0.5rem',
                 background: '#6b7280',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '0.875rem'
               }}
             >
               Пользователи
             </button>
           )}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span>{user?.name} ({user?.role})</span>
           <button 
             onClick={handleLogout}
             style={{
-              padding: '0.5rem 1rem',
+              padding: '0.5rem',
               background: '#ef4444',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: '0.875rem'
             }}
           >
             Выйти
@@ -214,7 +244,7 @@ export default function ContactsPage() {
         </div>
       </header>
 
-      <div style={{ padding: '2rem' }}>
+      <div style={{ padding: '1rem' }}>
         <div style={{ 
           background: 'white', 
           padding: '1rem', 
@@ -329,36 +359,6 @@ export default function ContactsPage() {
               }}
             >
               Сброс
-            </button>
-
-            <button
-              onClick={() => router.push('/events')}
-              style={{
-                padding: '0.5rem 0.75rem',
-                background: '#8b5cf6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.875rem'
-              }}
-            >
-              События
-            </button>
-
-            <button
-              onClick={() => router.push('/responsibles')}
-              style={{
-                padding: '0.5rem 0.75rem',
-                background: '#ec4899',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.875rem'
-              }}
-            >
-              Ответств.
             </button>
 
             {user?.role !== 'viewer' && (
