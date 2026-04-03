@@ -105,24 +105,73 @@ export default function EventsPage() {
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
       <header style={{ 
         background: 'white', 
-        padding: '1rem 2rem', 
+        padding: '1rem', 
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '0.5rem'
       }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>HandySearch - События</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span>{user?.name} ({user?.role})</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button
+            onClick={() => router.push('/contacts')}
+            style={{
+              padding: '0.5rem',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Конт.
+          </button>
+          <button
+            onClick={() => router.push('/responsibles')}
+            style={{
+              padding: '0.5rem',
+              background: '#ec4899',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Ответств.
+          </button>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>События</h1>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => router.push('/users')}
+              style={{
+                padding: '0.5rem',
+                background: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.875rem'
+              }}
+            >
+              Пользователи
+            </button>
+          )}
           <button 
             onClick={handleLogout}
             style={{
-              padding: '0.5rem 1rem',
+              padding: '0.5rem',
               background: '#ef4444',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: '0.875rem'
             }}
           >
             Выйти
@@ -130,23 +179,23 @@ export default function EventsPage() {
         </div>
       </header>
 
-      <div style={{ padding: '2rem' }}>
+      <div style={{ padding: '1rem' }}>
         <div style={{ 
           background: 'white', 
-          padding: '1.5rem', 
+          padding: '1rem', 
           borderRadius: '8px',
-          marginBottom: '1.5rem',
+          marginBottom: '1rem',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <input
               type="text"
-              placeholder="Поиск по названию, описанию..."
+              placeholder="Поиск..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
-                flex: '1',
-                minWidth: '200px',
+                flex: '1 1 100%',
+                minWidth: '150px',
                 padding: '0.5rem',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
@@ -161,70 +210,28 @@ export default function EventsPage() {
                 padding: '0.5rem',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '0.875rem'
               }}
             >
-              <option value="">Все типы</option>
+              <option value="">Тип события</option>
               {invitationTypes.map(type => (
                 <option key={type.id} value={type.id}>{type.name}</option>
               ))}
             </select>
 
-            {user?.role === 'admin' && (
-              <button
-                onClick={() => router.push('/users')}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#6b7280',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Пользователи
-              </button>
-            )}
-
-            <button
-              onClick={() => router.push('/contacts')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Контакты
-            </button>
-
-            <button
-              onClick={() => router.push('/responsibles')}
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#ec4899',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Ответственные
-            </button>
-
             {user?.role !== 'viewer' && (
               <button
                 onClick={() => setShowModal(true)}
                 style={{
-                  padding: '0.5rem 1rem',
+                  padding: '0.5rem 0.75rem',
                   background: '#10b981',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
-                  marginLeft: 'auto'
+                  fontSize: '0.875rem',
+                  flex: '1 1 100%',
+                  marginTop: '0.5rem'
                 }}
               >
                 + Добавить событие
@@ -233,7 +240,7 @@ export default function EventsPage() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))' }}>
+        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
           {filteredEvents.length === 0 ? (
             <div style={{ 
               background: 'white', 

@@ -174,9 +174,28 @@ export default function ContactsPage() {
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1rem'
       }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>HandySearch</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>HandySearch</h1>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => router.push('/users')}
+              style={{
+                padding: '0.5rem 1rem',
+                background: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Пользователи
+            </button>
+          )}
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <span>{user?.name} ({user?.role})</span>
           <button 
@@ -198,49 +217,20 @@ export default function ContactsPage() {
       <div style={{ padding: '2rem' }}>
         <div style={{ 
           background: 'white', 
-          padding: '1.5rem', 
+          padding: '1rem', 
           borderRadius: '8px',
-          marginBottom: '1.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            {user?.role === 'admin' && (
-              <button
-                onClick={() => router.push('/users')}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#6b7280',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Пользователи
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div style={{ 
-          background: 'white', 
-          padding: '1.5rem', 
-          borderRadius: '8px',
-          marginBottom: '1.5rem',
+          marginBottom: '1rem',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <input
               type="text"
-              placeholder="Поиск по имени, описанию, отчеству..."
+              placeholder="Поиск..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
-                flex: '1',
-                minWidth: '200px',
+                flex: '1 1 100%',
+                minWidth: '150px',
                 padding: '0.5rem',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
@@ -255,10 +245,11 @@ export default function ContactsPage() {
                 padding: '0.5rem',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                minWidth: '120px'
               }}
             >
-              <option value="">Все категории</option>
+              <option value="">Категория</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
@@ -271,10 +262,11 @@ export default function ContactsPage() {
                 padding: '0.5rem',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                minWidth: '100px'
               }}
             >
-              <option value="">Все теги</option>
+              <option value="">Тег</option>
               {tags.map(tag => (
                 <option key={tag.id} value={tag.id}>{tag.name}</option>
               ))}
@@ -290,7 +282,7 @@ export default function ContactsPage() {
                 border: '1px solid #ddd',
                 borderRadius: '4px',
                 fontSize: '1rem',
-                width: '120px'
+                width: '100px'
               }}
             />
 
@@ -327,26 +319,28 @@ export default function ContactsPage() {
             <button
               onClick={resetFilters}
               style={{
-                padding: '0.5rem 1rem',
+                padding: '0.5rem 0.75rem',
                 background: '#6b7280',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '0.875rem'
               }}
             >
-              Сбросить
+              Сброс
             </button>
 
             <button
               onClick={() => router.push('/events')}
               style={{
-                padding: '0.5rem 1rem',
+                padding: '0.5rem 0.75rem',
                 background: '#8b5cf6',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '0.875rem'
               }}
             >
               События
@@ -355,28 +349,31 @@ export default function ContactsPage() {
             <button
               onClick={() => router.push('/responsibles')}
               style={{
-                padding: '0.5rem 1rem',
+                padding: '0.5rem 0.75rem',
                 background: '#ec4899',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '0.875rem'
               }}
             >
-              Ответственные
+              Ответств.
             </button>
 
             {user?.role !== 'viewer' && (
               <button
                 onClick={() => setShowModal(true)}
                 style={{
-                  padding: '0.5rem 1rem',
+                  padding: '0.5rem 0.75rem',
                   background: '#10b981',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
-                  marginLeft: 'auto'
+                  fontSize: '0.875rem',
+                  flex: '1 1 100%',
+                  marginTop: '0.5rem'
                 }}
               >
                 + Добавить контакт
