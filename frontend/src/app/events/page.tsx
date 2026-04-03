@@ -114,6 +114,7 @@ export default function EventsPage() {
         gap: '0.5rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>События</h1>
           <button
             onClick={() => router.push('/contacts')}
             style={{
@@ -142,7 +143,6 @@ export default function EventsPage() {
           >
             Ответств.
           </button>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>События</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>

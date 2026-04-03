@@ -125,6 +125,7 @@ export default function ResponsiblesPage() {
         gap: '0.5rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Ответственные</h1>
           <button
             onClick={() => router.push('/contacts')}
             style={{
@@ -153,7 +154,6 @@ export default function ResponsiblesPage() {
           >
             События
           </button>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Ответственные</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {user?.role === 'admin' && (
