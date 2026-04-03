@@ -156,6 +156,7 @@ export default function ResponsiblesPage() {
           </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>
           {user?.role === 'admin' && (
             <button
               onClick={() => router.push('/users')}
@@ -213,9 +214,9 @@ export default function ResponsiblesPage() {
           background: 'white', 
           borderRadius: '8px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          overflow: 'hidden'
+          overflow: 'auto'
         }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
             <thead style={{ background: '#f9fafb' }}>
               <tr>
                 <th style={{ padding: '1rem', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Имя</th>
