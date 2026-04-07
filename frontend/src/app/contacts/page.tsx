@@ -763,22 +763,23 @@ export default function ContactsPage() {
 
               {user?.role === 'admin' && (
                 <div style={{ borderTop: '1px solid #ddd', paddingTop: '1rem', marginTop: '0.5rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                    <input
-                      type="checkbox"
-                      checked={newContact.visible_only_to_admin}
-                      onChange={(e) => setNewContact({ ...newContact, visible_only_to_admin: e.target.checked })}
-                    />
-                    <span>Виден только админу</span>
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input
-                      type="checkbox"
-                      checked={newContact.visible_only_to_editor}
-                      onChange={(e) => setNewContact({ ...newContact, visible_only_to_editor: e.target.checked })}
-                    />
-                    <span>Виден только редактору (только для своих)</span>
-                  </label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem' }}>Видимость</label>
+                  <select
+                    value={newContact.visible_only_to_admin ? 'admin' : newContact.visible_only_to_editor ? 'editor' : 'all'}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewContact({
+                        ...newContact,
+                        visible_only_to_admin: val === 'admin',
+                        visible_only_to_editor: val === 'editor'
+                      });
+                    }}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  >
+                    <option value="all">Все (видят все)</option>
+                    <option value="editor">Редактор + Админ</option>
+                    <option value="admin">Только Админ</option>
+                  </select>
                 </div>
               )}
 
