@@ -106,7 +106,12 @@ class ContactController extends Controller
             $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
         } elseif ($user->role === 'editor') {
             $validated['visible_only_to_admin'] = false;
-            $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
+            if ($request->boolean('visible_only_to_editor', false)) {
+                $validated['visible_only_to_editor'] = true;
+                $validated['responsible_id'] = $user->id;
+            } else {
+                $validated['visible_only_to_editor'] = false;
+            }
         } else {
             $validated['visible_only_to_admin'] = false;
             $validated['visible_only_to_editor'] = false;
@@ -194,7 +199,12 @@ class ContactController extends Controller
             $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
         } elseif ($user->role === 'editor') {
             $validated['visible_only_to_admin'] = false;
-            $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
+            if ($request->boolean('visible_only_to_editor', false)) {
+                $validated['visible_only_to_editor'] = true;
+                $validated['responsible_id'] = $user->id;
+            } else {
+                $validated['visible_only_to_editor'] = false;
+            }
         }
 
         $contact->update($validated);
