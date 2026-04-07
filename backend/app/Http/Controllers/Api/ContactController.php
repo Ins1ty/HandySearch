@@ -19,15 +19,11 @@ class ContactController extends Controller
             $query->where('visible_only_to_admin', false);
         }
         
-        // Viewer only sees public contacts (visible_only_to_admin = false AND visible_only_to_editor = false)
+        // Viewer only sees public contacts (visible_only_to_editor = false)
         if ($user->role === 'viewer') {
             $query->where('visible_only_to_editor', false);
-        } elseif ($user->role === 'editor') {
-            // Editor sees: public contacts + all contacts visible to editors (any responsible)
-            $query->where(function ($q) {
-                $q->where('visible_only_to_editor', false);
-            });
         }
+        // Editor sees: public + all contacts visible to editors (handled by first filter already)
 
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
