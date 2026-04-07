@@ -14,13 +14,16 @@ class ContactController extends Controller
         $user = Auth::user();
         $query = Contact::with(['category', 'responsible', 'tags']);
 
+        // Admin sees everything
         if ($user->role !== 'admin') {
             $query->where('visible_only_to_admin', false);
         }
         
+        // Viewer only sees public contacts (visible_only_to_admin = false AND visible_only_to_editor = false)
         if ($user->role === 'viewer') {
             $query->where('visible_only_to_editor', false);
         } elseif ($user->role === 'editor') {
+            // Editor sees: public contacts + their own contacts (where responsible_id = user.id)
             $query->where(function ($q) use ($user) {
                 $q->where('visible_only_to_editor', false)
                   ->orWhere('responsible_id', $user->id);
@@ -96,6 +99,8 @@ class ContactController extends Controller
             'region' => 'nullable|exists:cities,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
+            'visible_only_to_admin' => 'nullable|boolean',
+            'visible_only_to_editor' => 'nullable|boolean',
         ]);
 
         $validated['invitation_types'] = $request->has('invitation_types') ? implode(',', $request->invitation_types) : null;
@@ -104,13 +109,15 @@ class ContactController extends Controller
         if ($user->role === 'admin') {
             $validated['visible_only_to_admin'] = $request->boolean('visible_only_to_admin', false);
             $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
+            
+            // If visible to editor but no responsible set, need to handle this
+            // Admin can set any responsible_id, or leave it null for now
         } elseif ($user->role === 'editor') {
             $validated['visible_only_to_admin'] = false;
-            if ($request->boolean('visible_only_to_editor', false)) {
-                $validated['visible_only_to_editor'] = true;
+            $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
+            if ($validated['visible_only_to_editor']) {
+                // Editors can only create contacts visible to themselves
                 $validated['responsible_id'] = $user->id;
-            } else {
-                $validated['visible_only_to_editor'] = false;
             }
         } else {
             $validated['visible_only_to_admin'] = false;
