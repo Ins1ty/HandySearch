@@ -25,6 +25,7 @@ class Contact extends Model
         'region',
         'visible_only_to_admin',
         'visible_only_to_editor',
+        'gifts_given',
     ];
 
     protected $casts = [

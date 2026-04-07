@@ -96,6 +96,7 @@ class ContactController extends Controller
             'tags.*' => 'exists:tags,id',
             'visible_only_to_admin' => 'nullable|boolean',
             'visible_only_to_editor' => 'nullable|boolean',
+            'gifts_given' => 'nullable|string',
         ]);
 
         $validated['invitation_types'] = $request->has('invitation_types') ? implode(',', $request->invitation_types) : null;
@@ -170,6 +171,9 @@ class ContactController extends Controller
             'region' => 'nullable|exists:cities,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
+            'visible_only_to_admin' => 'nullable|boolean',
+            'visible_only_to_editor' => 'nullable|boolean',
+            'gifts_given' => 'nullable|string',
         ]);
 
         if ($request->has('invitation_types')) {
