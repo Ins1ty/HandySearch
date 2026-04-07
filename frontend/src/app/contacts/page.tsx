@@ -46,6 +46,7 @@ export default function ContactsPage() {
     region: null as number | null,
     visible_only_to_admin: false,
     visible_only_to_editor: false,
+    gifts_given: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -111,6 +112,7 @@ export default function ContactsPage() {
         required_invitations: newContact.required_invitations.length > 0 ? newContact.required_invitations : undefined,
         postal_address: newContact.postal_address || undefined,
         region: newContact.region || undefined,
+        gifts_given: newContact.gifts_given || undefined,
       };
       
       if (user?.role === 'admin') {
@@ -126,7 +128,7 @@ export default function ContactsPage() {
         name: '', description: '', priority_contact: '',
         phone: '', email: '', social: '', birthday: '', category_id: null, responsible_id: null,
         tags: [], invitation_types: [], required_invitations: [], postal_address: '', region: null,
-        visible_only_to_admin: false, visible_only_to_editor: false
+        visible_only_to_admin: false, visible_only_to_editor: false, gifts_given: ''
       });
       loadData();
     } catch (error: any) {
@@ -782,6 +784,17 @@ export default function ContactsPage() {
                   </select>
                 </div>
               )}
+
+              <div style={{ borderTop: '1px solid #ddd', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Что дарили</label>
+                <textarea
+                  value={newContact.gifts_given}
+                  onChange={(e) => setNewContact({ ...newContact, gifts_given: e.target.value })}
+                  placeholder="Что дарили этому контакту"
+                  rows={2}
+                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                />
+              </div>
 
               {user?.role === 'editor' && (
                 <div style={{ borderTop: '1px solid #ddd', paddingTop: '1rem', marginTop: '0.5rem' }}>
