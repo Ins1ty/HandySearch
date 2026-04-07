@@ -109,9 +109,6 @@ class ContactController extends Controller
         if ($user->role === 'admin') {
             $validated['visible_only_to_admin'] = $request->boolean('visible_only_to_admin', false);
             $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
-            
-            // If visible to editor but no responsible set, need to handle this
-            // Admin can set any responsible_id, or leave it null for now
         } elseif ($user->role === 'editor') {
             $validated['visible_only_to_admin'] = false;
             $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
