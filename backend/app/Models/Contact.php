@@ -23,6 +23,8 @@ class Contact extends Model
         'required_invitations',
         'postal_address',
         'region',
+        'visible_only_to_admin',
+        'visible_only_to_editor',
     ];
 
     protected $casts = [

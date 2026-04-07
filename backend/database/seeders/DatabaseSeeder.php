@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\City;
 use App\Models\InvitationType;
 use App\Models\Responsible;
 use App\Models\User;
@@ -79,6 +80,21 @@ class DatabaseSeeder extends Seeder
 
         foreach ($invitationTypes as $type) {
             InvitationType::create($type);
+        }
+
+        $cities = [
+            ['name' => 'Воронеж'],
+            ['name' => 'Москва'],
+            ['name' => 'Санкт-Петербург'],
+            ['name' => 'Краснодар'],
+            ['name' => 'Ростов-на-Дону'],
+            ['name' => 'Белгород'],
+            ['name' => 'Курск'],
+            ['name' => 'Тамбов'],
+        ];
+
+        foreach ($cities as $city) {
+            City::create($city);
         }
 
         $responsibles = [

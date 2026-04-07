@@ -169,6 +169,20 @@ export default function UsersPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>
+          <button
+            onClick={() => router.push('/settings')}
+            style={{
+              padding: '0.5rem',
+              background: '#f59e0b',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Настройки
+          </button>
           <button 
             onClick={handleLogout}
             style={{

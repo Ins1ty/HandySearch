@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, useDataStore, useFilterStore } from '@/store';
-import { contactsApi, categoriesApi, tagsApi, responsiblesApi, authApi, eventsApi } from '@/lib/api';
+import { contactsApi, categoriesApi, tagsApi, responsiblesApi, authApi, eventsApi, citiesApi } from '@/lib/api';
 
 const priorityIcons: Record<string, string> = {
   call: '📞',
@@ -22,7 +22,7 @@ const priorityLabels: Record<string, string> = {
 export default function ContactsPage() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { contacts, categories, tags, responsibles, events, setContacts, setCategories, setTags, setResponsibles, setEvents } = useDataStore();
+  const { contacts, categories, tags, responsibles, events, cities, setContacts, setCategories, setTags, setResponsibles, setEvents, setCities } = useDataStore();
   const { 
     search, categoryId, tagId, region, sortBy, sortOrder,
     setSearch, setCategoryId, setTagId, setRegion, setSortBy, setSortOrder, resetFilters 
@@ -40,10 +40,12 @@ export default function ContactsPage() {
     category_id: null as number | null,
     responsible_id: null as number | null,
     tags: [] as number[],
-    invitation_types: '',
-    required_invitations: '',
+    invitation_types: [] as string[],
+    required_invitations: [] as string[],
     postal_address: '',
-    region: '',
+    region: null as number | null,
+    visible_only_to_admin: false,
+    visible_only_to_editor: false,
   });
   const [saving, setSaving] = useState(false);
 
@@ -57,18 +59,20 @@ export default function ContactsPage() {
 
   const loadData = async () => {
     try {
-      const [contactsRes, categoriesRes, tagsRes, responsiblesRes, eventsRes] = await Promise.all([
+      const [contactsRes, categoriesRes, tagsRes, responsiblesRes, eventsRes, citiesRes] = await Promise.all([
         contactsApi.getAll(),
         categoriesApi.getAll(),
         tagsApi.getAll(),
         responsiblesApi.getAll(),
         eventsApi.getAll(),
+        citiesApi.getAll(),
       ]);
       setContacts(contactsRes.data);
       setCategories(categoriesRes.data);
       setTags(tagsRes.data);
       setResponsibles(responsiblesRes.data);
       setEvents(eventsRes.data);
+      setCities(citiesRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
       if (error === 'Unauthorized') {
@@ -103,17 +107,26 @@ export default function ContactsPage() {
         category_id: newContact.category_id || undefined,
         responsible_id: newContact.responsible_id || undefined,
         tags: newContact.tags.length > 0 ? newContact.tags : undefined,
-        invitation_types: newContact.invitation_types || undefined,
-        required_invitations: newContact.required_invitations || undefined,
+        invitation_types: newContact.invitation_types.length > 0 ? newContact.invitation_types : undefined,
+        required_invitations: newContact.required_invitations.length > 0 ? newContact.required_invitations : undefined,
         postal_address: newContact.postal_address || undefined,
         region: newContact.region || undefined,
       };
+      
+      if (user?.role === 'admin') {
+        dataToSend.visible_only_to_admin = newContact.visible_only_to_admin;
+        dataToSend.visible_only_to_editor = newContact.visible_only_to_editor;
+      } else if (user?.role === 'editor') {
+        dataToSend.visible_only_to_editor = newContact.visible_only_to_editor;
+      }
+      
       await contactsApi.create(dataToSend);
       setShowModal(false);
       setNewContact({
         name: '', description: '', priority_contact: '',
         phone: '', email: '', social: '', birthday: '', category_id: null, responsible_id: null,
-        tags: [], invitation_types: '', required_invitations: '', postal_address: '', region: ''
+        tags: [], invitation_types: [], required_invitations: [], postal_address: '', region: null,
+        visible_only_to_admin: false, visible_only_to_editor: false
       });
       loadData();
     } catch (error: any) {
@@ -212,20 +225,36 @@ export default function ContactsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>
           {user?.role === 'admin' && (
-            <button
-              onClick={() => router.push('/users')}
-              style={{
-                padding: '0.5rem',
-                background: '#6b7280',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.875rem'
-              }}
-            >
-              Пользователи
-            </button>
+            <>
+              <button
+                onClick={() => router.push('/users')}
+                style={{
+                  padding: '0.5rem',
+                  background: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem'
+                }}
+              >
+                Пользователи
+              </button>
+              <button
+                onClick={() => router.push('/settings')}
+                style={{
+                  padding: '0.5rem',
+                  background: '#f59e0b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem'
+                }}
+              >
+                Настройки
+              </button>
+            </>
           )}
           <button 
             onClick={handleLogout}
@@ -659,14 +688,17 @@ export default function ContactsPage() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Регион</label>
-                  <input
-                    type="text"
-                    value={newContact.region}
-                    onChange={(e) => setNewContact({ ...newContact, region: e.target.value })}
-                    placeholder="Воронеж, область и т.д."
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Город</label>
+                  <select
+                    value={newContact.region || ''}
+                    onChange={(e) => setNewContact({ ...newContact, region: e.target.value ? Number(e.target.value) : null })}
                     style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
+                  >
+                    <option value="">Не выбран</option>
+                    {cities.map(city => (
+                      <option key={city.id} value={city.id}>{city.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -683,37 +715,79 @@ export default function ContactsPage() {
 
               <div>
                 <label style={{ display: 'block', marginBottom: '0.25rem' }}>Приглашать на события</label>
-                <select
-                  multiple
-                  value={newContact.invitation_types ? newContact.invitation_types.split(',') : []}
-                  onChange={(e) => {
-                    const selected = Array.from(e.target.selectedOptions, option => option.value);
-                    setNewContact({ ...newContact, invitation_types: selected.join(',') });
-                  }}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', height: '100px' }}
-                >
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {events.map(event => (
-                    <option key={event.id} value={event.title}>{event.title}</option>
+                    <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={newContact.invitation_types.includes(event.title)}
+                        onChange={(e) => {
+                          const selected = e.target.checked
+                            ? [...newContact.invitation_types, event.title]
+                            : newContact.invitation_types.filter(t => t !== event.title);
+                          setNewContact({ ...newContact, invitation_types: selected });
+                        }}
+                      />
+                      <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                    </label>
                   ))}
-                </select>
+                </div>
               </div>
 
               <div>
                 <label style={{ display: 'block', marginBottom: '0.25rem' }}>Обязательные события</label>
-                <select
-                  multiple
-                  value={newContact.required_invitations ? newContact.required_invitations.split(',') : []}
-                  onChange={(e) => {
-                    const selected = Array.from(e.target.selectedOptions, option => option.value);
-                    setNewContact({ ...newContact, required_invitations: selected.join(',') });
-                  }}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', height: '100px' }}
-                >
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {events.map(event => (
-                    <option key={event.id} value={event.title}>{event.title}</option>
+                    <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={newContact.required_invitations.includes(event.title)}
+                        onChange={(e) => {
+                          const selected = e.target.checked
+                            ? [...newContact.required_invitations, event.title]
+                            : newContact.required_invitations.filter(t => t !== event.title);
+                          setNewContact({ ...newContact, required_invitations: selected });
+                        }}
+                      />
+                      <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                    </label>
                   ))}
-                </select>
+                </div>
               </div>
+
+              {user?.role === 'admin' && (
+                <div style={{ borderTop: '1px solid #ddd', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={newContact.visible_only_to_admin}
+                      onChange={(e) => setNewContact({ ...newContact, visible_only_to_admin: e.target.checked })}
+                    />
+                    <span>Виден только админу</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={newContact.visible_only_to_editor}
+                      onChange={(e) => setNewContact({ ...newContact, visible_only_to_editor: e.target.checked })}
+                    />
+                    <span>Виден только редактору (только для своих)</span>
+                  </label>
+                </div>
+              )}
+
+              {user?.role === 'editor' && (
+                <div style={{ borderTop: '1px solid #ddd', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={newContact.visible_only_to_editor}
+                      onChange={(e) => setNewContact({ ...newContact, visible_only_to_editor: e.target.checked })}
+                    />
+                    <span>Виден только мне (редактору)</span>
+                  </label>
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'flex-end' }}>

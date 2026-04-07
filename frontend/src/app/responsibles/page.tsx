@@ -158,20 +158,36 @@ export default function ResponsiblesPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>
           {user?.role === 'admin' && (
-            <button
-              onClick={() => router.push('/users')}
-              style={{
-                padding: '0.5rem',
-                background: '#6b7280',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.875rem'
-              }}
-            >
-              Пользователи
-            </button>
+            <>
+              <button
+                onClick={() => router.push('/users')}
+                style={{
+                  padding: '0.5rem',
+                  background: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem'
+                }}
+              >
+                Пользователи
+              </button>
+              <button
+                onClick={() => router.push('/settings')}
+                style={{
+                  padding: '0.5rem',
+                  background: '#f59e0b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem'
+                }}
+              >
+                Настройки
+              </button>
+            </>
           )}
           <button 
             onClick={handleLogout}

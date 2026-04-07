@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\GiftController;
@@ -21,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('tags', TagController::class);
     Route::apiResource('invitation-types', InvitationTypeController::class);
+    Route::apiResource('cities', CityController::class);
     Route::apiResource('gifts', GiftController::class);
     Route::apiResource('contacts', ContactController::class);
     Route::apiResource('events', EventController::class);

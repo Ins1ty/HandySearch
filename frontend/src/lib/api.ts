@@ -87,3 +87,10 @@ export const responsiblesApi = {
   update: (id: number, data: any) => api.put(`/responsibles/${id}`, data),
   delete: (id: number) => api.delete(`/responsibles/${id}`),
 };
+
+export const citiesApi = {
+  getAll: () => api.get('/cities'),
+  create: (data: any) => api.post('/cities', data),
+  update: (id: number, data: any) => api.put(`/cities/${id}`, data),
+  delete: (id: number) => api.delete(`/cities/${id}`),
+};

@@ -5,12 +5,27 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
         $query = Contact::with(['category', 'responsible', 'tags']);
+
+        if ($user->role !== 'admin') {
+            $query->where('visible_only_to_admin', false);
+        }
+        
+        if ($user->role === 'viewer') {
+            $query->where('visible_only_to_editor', false);
+        } elseif ($user->role === 'editor') {
+            $query->where(function ($q) use ($user) {
+                $q->where('visible_only_to_editor', false)
+                  ->orWhere('responsible_id', $user->id);
+            });
+        }
 
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
@@ -61,6 +76,8 @@ class ContactController extends Controller
 
     public function store(Request $request)
     {
+        $user = Auth::user();
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -73,13 +90,27 @@ class ContactController extends Controller
             'birthday' => 'nullable|date',
             'responsible_id' => 'nullable|exists:responsibles,id',
             'category_id' => 'nullable|exists:categories,id',
-            'invitation_types' => 'nullable|string',
-            'required_invitations' => 'nullable|string',
+            'invitation_types' => 'nullable|array',
+            'required_invitations' => 'nullable|array',
             'postal_address' => 'nullable|string',
-            'region' => 'nullable|string|max:255',
+            'region' => 'nullable|exists:cities,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
         ]);
+
+        $validated['invitation_types'] = $request->has('invitation_types') ? implode(',', $request->invitation_types) : null;
+        $validated['required_invitations'] = $request->has('required_invitations') ? implode(',', $request->required_invitations) : null;
+
+        if ($user->role === 'admin') {
+            $validated['visible_only_to_admin'] = $request->boolean('visible_only_to_admin', false);
+            $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
+        } elseif ($user->role === 'editor') {
+            $validated['visible_only_to_admin'] = false;
+            $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
+        } else {
+            $validated['visible_only_to_admin'] = false;
+            $validated['visible_only_to_editor'] = false;
+        }
 
         $contact = Contact::create($validated);
 
@@ -94,6 +125,21 @@ class ContactController extends Controller
 
     public function show(Contact $contact)
     {
+        $user = Auth::user();
+        
+        if ($contact->visible_only_to_admin && $user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+        
+        if ($contact->visible_only_to_editor) {
+            if ($user->role === 'viewer') {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+            if ($user->role === 'editor' && $contact->responsible_id !== $user->id) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+        }
+        
         $contact->load(['category', 'responsible', 'tags', 'events', 'gifts']);
 
         return response()->json($contact);
@@ -101,6 +147,21 @@ class ContactController extends Controller
 
     public function update(Request $request, Contact $contact)
     {
+        $user = Auth::user();
+        
+        if ($contact->visible_only_to_admin && $user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+        
+        if ($contact->visible_only_to_editor) {
+            if ($user->role === 'viewer') {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+            if ($user->role === 'editor' && $contact->responsible_id !== $user->id) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
@@ -113,13 +174,28 @@ class ContactController extends Controller
             'birthday' => 'nullable|date',
             'responsible_id' => 'nullable|exists:responsibles,id',
             'category_id' => 'nullable|exists:categories,id',
-            'invitation_types' => 'nullable|string',
-            'required_invitations' => 'nullable|string',
+            'invitation_types' => 'nullable|array',
+            'required_invitations' => 'nullable|array',
             'postal_address' => 'nullable|string',
-            'region' => 'nullable|string|max:255',
+            'region' => 'nullable|exists:cities,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
         ]);
+
+        if ($request->has('invitation_types')) {
+            $validated['invitation_types'] = implode(',', $request->invitation_types);
+        }
+        if ($request->has('required_invitations')) {
+            $validated['required_invitations'] = implode(',', $request->required_invitations);
+        }
+
+        if ($user->role === 'admin') {
+            $validated['visible_only_to_admin'] = $request->boolean('visible_only_to_admin', false);
+            $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
+        } elseif ($user->role === 'editor') {
+            $validated['visible_only_to_admin'] = false;
+            $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
+        }
 
         $contact->update($validated);
 

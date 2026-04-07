@@ -60,6 +60,8 @@ interface Contact {
   required_invitations?: string;
   postal_address?: string;
   region?: string;
+  visible_only_to_admin?: boolean;
+  visible_only_to_editor?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -99,6 +101,11 @@ interface InvitationType {
   color: string;
 }
 
+interface City {
+  id: number;
+  name: string;
+}
+
 interface Responsible {
   id: number;
   name: string;
@@ -114,6 +121,7 @@ interface DataState {
   events: Event[];
   gifts: Gift[];
   invitationTypes: InvitationType[];
+  cities: City[];
   responsibles: Responsible[];
   setContacts: (contacts: Contact[]) => void;
   setCategories: (categories: Category[]) => void;
@@ -121,6 +129,7 @@ interface DataState {
   setEvents: (events: Event[]) => void;
   setGifts: (gifts: Gift[]) => void;
   setInvitationTypes: (types: InvitationType[]) => void;
+  setCities: (cities: City[]) => void;
   setResponsibles: (responsibles: Responsible[]) => void;
 }
 
@@ -131,6 +140,7 @@ export const useDataStore = create<DataState>((set) => ({
   events: [],
   gifts: [],
   invitationTypes: [],
+  cities: [],
   responsibles: [],
   setContacts: (contacts) => set({ contacts }),
   setCategories: (categories) => set({ categories }),
@@ -138,6 +148,7 @@ export const useDataStore = create<DataState>((set) => ({
   setEvents: (events) => set({ events }),
   setGifts: (gifts) => set({ gifts }),
   setInvitationTypes: (invitationTypes) => set({ invitationTypes }),
+  setCities: (cities) => set({ cities }),
   setResponsibles: (responsibles) => set({ responsibles }),
 }));
 
