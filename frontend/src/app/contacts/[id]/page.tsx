@@ -38,6 +38,9 @@ interface Contact {
   required_invitations?: string;
   postal_address?: string;
   region?: number | string;
+  visible_only_to_admin?: boolean;
+  visible_only_to_editor?: boolean;
+  gifts_given?: string;
 }
 
 export default function ContactDetailPage() {
@@ -508,6 +511,21 @@ export default function ContactDetailPage() {
                   </label>
                 </div>
               )}
+
+              <div style={{ marginTop: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Что дарили</label>
+                {editing ? (
+                  <textarea
+                    value={formData.gifts_given || ''}
+                    onChange={(e) => setFormData({ ...formData, gifts_given: e.target.value })}
+                    placeholder="Что дарили этому контакту"
+                    rows={2}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                ) : (
+                  <div style={{ whiteSpace: 'pre-wrap' }}>{contact.gifts_given || '-'}</div>
+                )}
+              </div>
             </div>
           </div>
 
