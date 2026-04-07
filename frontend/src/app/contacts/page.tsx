@@ -148,8 +148,11 @@ export default function ContactsPage() {
     if (tagId && !contact.tags?.some(t => t.id === tagId)) {
       return false;
     }
-    if (region && !contact.region?.toLowerCase().includes(region.toLowerCase())) {
-      return false;
+    if (region) {
+      const cityName = contact.region ? cities.find(c => c.id === Number(contact.region))?.name || '' : '';
+      if (!cityName.toLowerCase().includes(region.toLowerCase())) {
+        return false;
+      }
     }
     return true;
   });
@@ -331,9 +334,7 @@ export default function ContactsPage() {
               ))}
             </select>
 
-            <input
-              type="text"
-              placeholder="Регион..."
+            <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
               style={{
@@ -341,9 +342,14 @@ export default function ContactsPage() {
                 border: '1px solid #ddd',
                 borderRadius: '4px',
                 fontSize: '1rem',
-                width: '100px'
+                minWidth: '100px'
               }}
-            />
+            >
+              <option value="">Город</option>
+              {cities.map(city => (
+                <option key={city.id} value={city.name}>{city.name}</option>
+              ))}
+            </select>
 
             <select
               value={sortBy}
@@ -405,7 +411,7 @@ export default function ContactsPage() {
                   marginTop: '0.5rem'
                 }}
               >
-                + Добавить контакт
+                + добавить контакт
               </button>
             )}
           </div>
@@ -489,7 +495,7 @@ export default function ContactsPage() {
                       ) : '-'}
                     </td>
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
-                      {contact.region || '-'}
+                      {contact.region ? cities.find(c => c.id === Number(contact.region))?.name || '-' : '-'}
                     </td>
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>{contact.phone || '-'}</td>
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>{contact.email || '-'}</td>
@@ -549,7 +555,7 @@ export default function ContactsPage() {
             overflow: 'auto'
           }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
-              Добавить контакт
+              добавить контакт
             </h2>
             
             <div style={{ display: 'grid', gap: '1rem' }}>

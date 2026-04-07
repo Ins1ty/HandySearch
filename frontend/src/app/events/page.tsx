@@ -250,7 +250,7 @@ export default function EventsPage() {
                   marginTop: '0.5rem'
                 }}
               >
-                + Добавить событие
+                + добавить событие
               </button>
             )}
           </div>

@@ -28,6 +28,16 @@ export default function SettingsPage() {
     { id: 'cities', label: 'Города' },
   ];
 
+  const getSingularLabel = (id: string): string => {
+    switch (id) {
+      case 'tags': return 'тег';
+      case 'categories': return 'категорию';
+      case 'invitationTypes': return 'тип события';
+      case 'cities': return 'город';
+      default: return 'элемент';
+    }
+  };
+
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'admin') {
       router.push('/');
@@ -260,7 +270,7 @@ export default function SettingsPage() {
             marginBottom: '1rem'
           }}
         >
-          + Добавить {tabs.find(t => t.id === activeTab)?.label.slice(0, -1)}
+          + добавить {getSingularLabel(activeTab)}
         </button>
 
         <div style={{ 
@@ -364,7 +374,7 @@ export default function SettingsPage() {
             width: '90%'
           }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-              {editingItem ? 'Изменить' : 'Добавить'} {tabs.find(t => t.id === activeTab)?.label.slice(0, -1)}
+              {editingItem ? 'Изменить' : 'Добавить'} {getSingularLabel(activeTab)}
             </h2>
             
             <div style={{ display: 'grid', gap: '1rem' }}>

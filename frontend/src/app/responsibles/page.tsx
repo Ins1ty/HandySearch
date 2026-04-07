@@ -222,7 +222,7 @@ export default function ResponsiblesPage() {
               marginBottom: '1rem'
             }}
           >
-            + Добавить ответственного
+            + добавить ответственного
           </button>
         )}
 

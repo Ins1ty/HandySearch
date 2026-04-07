@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore, useDataStore } from '@/store';
-import { contactsApi, categoriesApi, tagsApi, eventsApi, invitationTypesApi, authApi } from '@/lib/api';
+import { contactsApi, categoriesApi, tagsApi, eventsApi, invitationTypesApi, authApi, citiesApi } from '@/lib/api';
 
 const priorityIcons: Record<string, string> = {
   call: '📞',
@@ -37,14 +37,14 @@ interface Contact {
   invitation_types?: string;
   required_invitations?: string;
   postal_address?: string;
-  region?: string;
+  region?: number | string;
 }
 
 export default function ContactDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { categories, tags, events, invitationTypes, setCategories, setTags, setEvents, setInvitationTypes } = useDataStore();
+  const { categories, tags, events, invitationTypes, cities, setCategories, setTags, setEvents, setInvitationTypes, setCities } = useDataStore();
   const [contact, setContact] = useState<Contact | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -61,24 +61,28 @@ export default function ContactDetailPage() {
 
   const loadData = async () => {
     try {
-      const [contactRes, categoriesRes, tagsRes, eventsRes, allEventsRes, typesRes] = await Promise.all([
+      const [contactRes, categoriesRes, tagsRes, eventsRes, allEventsRes, typesRes, citiesRes] = await Promise.all([
         contactsApi.getOne(Number(params.id)),
         categoriesApi.getAll(),
         tagsApi.getAll(),
         eventsApi.getAll({ contact_id: String(params.id) }),
         eventsApi.getAll(),
         invitationTypesApi.getAll(),
+        citiesApi.getAll(),
       ]);
       setContact(contactRes.data);
       setFormData({
         ...contactRes.data,
         tags: contactRes.data.tags?.map((t: any) => t.id) || [],
+        invitation_types: contactRes.data.invitation_types ? contactRes.data.invitation_types.split(',') : [],
+        required_invitations: contactRes.data.required_invitations ? contactRes.data.required_invitations.split(',') : [],
       });
       setCategories(categoriesRes.data);
       setTags(tagsRes.data);
       setEvents(eventsRes.data);
       setAllEvents(allEventsRes.data);
       setInvitationTypes(typesRes.data);
+      setCities(citiesRes.data);
     } catch (error) {
       console.error('Error loading contact:', error);
     } finally {
@@ -280,17 +284,20 @@ export default function ContactDetailPage() {
               </div>
 
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Регион</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Город</label>
                 {editing ? (
-                  <input
-                    type="text"
+                  <select
                     value={formData.region || ''}
-                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                    placeholder="Воронеж, область и т.д."
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value ? Number(e.target.value) : null })}
                     style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
+                  >
+                    <option value="">Не выбран</option>
+                    {cities.map(city => (
+                      <option key={city.id} value={city.id}>{city.name}</option>
+                    ))}
+                  </select>
                 ) : (
-                  <div>{contact.region || '-'}</div>
+                  <div>{contact.region ? cities.find(c => c.id === Number(contact.region))?.name || '-' : '-'}</div>
                 )}
               </div>
 
@@ -418,19 +425,24 @@ export default function ContactDetailPage() {
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Куда приглашать</label>
                 {editing ? (
-                  <select
-                    multiple
-                    value={formData.invitation_types ? formData.invitation_types.split(',') : []}
-                    onChange={(e) => {
-                      const selected = Array.from(e.target.selectedOptions, option => option.value);
-                      setFormData({ ...formData, invitation_types: selected.join(',') });
-                    }}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', height: '100px' }}
-                  >
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                     {allEvents.map(event => (
-                      <option key={event.id} value={event.title}>{event.title}</option>
+                      <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={(formData.invitation_types as string[] || []).includes(event.title)}
+                          onChange={(e) => {
+                            const current = formData.invitation_types as string[] || [];
+                            const selected = e.target.checked
+                              ? [...current, event.title]
+                              : current.filter(t => t !== event.title);
+                            setFormData({ ...formData, invitation_types: selected });
+                          }}
+                        />
+                        <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                      </label>
                     ))}
-                  </select>
+                  </div>
                 ) : (
                   <div>{contact.invitation_types || '-'}</div>
                 )}
@@ -439,23 +451,62 @@ export default function ContactDetailPage() {
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Обязательные приглашения</label>
                 {editing ? (
-                  <select
-                    multiple
-                    value={formData.required_invitations ? formData.required_invitations.split(',') : []}
-                    onChange={(e) => {
-                      const selected = Array.from(e.target.selectedOptions, option => option.value);
-                      setFormData({ ...formData, required_invitations: selected.join(',') });
-                    }}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px', height: '100px' }}
-                  >
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                     {allEvents.map(event => (
-                      <option key={event.id} value={event.title}>{event.title}</option>
+                      <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={(formData.required_invitations as string[] || []).includes(event.title)}
+                          onChange={(e) => {
+                            const current = formData.required_invitations as string[] || [];
+                            const selected = e.target.checked
+                              ? [...current, event.title]
+                              : current.filter(t => t !== event.title);
+                            setFormData({ ...formData, required_invitations: selected });
+                          }}
+                        />
+                        <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                      </label>
                     ))}
-                  </select>
+                  </div>
                 ) : (
                   <div>{contact.required_invitations || '-'}</div>
                 )}
               </div>
+
+              {editing && user?.role === 'admin' && (
+                <div style={{ borderTop: '1px solid #ddd', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.visible_only_to_admin || false}
+                      onChange={(e) => setFormData({ ...formData, visible_only_to_admin: e.target.checked })}
+                    />
+                    <span>Виден только админу</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.visible_only_to_editor || false}
+                      onChange={(e) => setFormData({ ...formData, visible_only_to_editor: e.target.checked })}
+                    />
+                    <span>Виден только редактору (только для своих)</span>
+                  </label>
+                </div>
+              )}
+
+              {editing && user?.role === 'editor' && (
+                <div style={{ borderTop: '1px solid #ddd', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.visible_only_to_editor || false}
+                      onChange={(e) => setFormData({ ...formData, visible_only_to_editor: e.target.checked })}
+                    />
+                    <span>Виден только мне (редактору)</span>
+                  </label>
+                </div>
+              )}
             </div>
           </div>
 

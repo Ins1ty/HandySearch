@@ -216,7 +216,7 @@ export default function UsersPage() {
               marginBottom: '1rem'
             }}
           >
-            + Добавить пользователя
+            + добавить пользователя
           </button>
         )}
 
