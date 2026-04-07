@@ -23,10 +23,9 @@ class ContactController extends Controller
         if ($user->role === 'viewer') {
             $query->where('visible_only_to_editor', false);
         } elseif ($user->role === 'editor') {
-            // Editor sees: public contacts + their own contacts (where responsible_id = user.id)
-            $query->where(function ($q) use ($user) {
-                $q->where('visible_only_to_editor', false)
-                  ->orWhere('responsible_id', $user->id);
+            // Editor sees: public contacts + all contacts visible to editors (any responsible)
+            $query->where(function ($q) {
+                $q->where('visible_only_to_editor', false);
             });
         }
 
@@ -112,10 +111,6 @@ class ContactController extends Controller
         } elseif ($user->role === 'editor') {
             $validated['visible_only_to_admin'] = false;
             $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
-            if ($validated['visible_only_to_editor']) {
-                // Editors can only create contacts visible to themselves
-                $validated['responsible_id'] = $user->id;
-            }
         } else {
             $validated['visible_only_to_admin'] = false;
             $validated['visible_only_to_editor'] = false;
@@ -140,13 +135,8 @@ class ContactController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         
-        if ($contact->visible_only_to_editor) {
-            if ($user->role === 'viewer') {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            }
-            if ($user->role === 'editor' && $contact->responsible_id !== $user->id) {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            }
+        if ($contact->visible_only_to_editor && $user->role === 'viewer') {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
         
         $contact->load(['category', 'responsible', 'tags', 'events', 'gifts']);
@@ -162,13 +152,8 @@ class ContactController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         
-        if ($contact->visible_only_to_editor) {
-            if ($user->role === 'viewer') {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            }
-            if ($user->role === 'editor' && $contact->responsible_id !== $user->id) {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            }
+        if ($contact->visible_only_to_editor && $user->role === 'viewer') {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $validated = $request->validate([
@@ -203,12 +188,7 @@ class ContactController extends Controller
             $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
         } elseif ($user->role === 'editor') {
             $validated['visible_only_to_admin'] = false;
-            if ($request->boolean('visible_only_to_editor', false)) {
-                $validated['visible_only_to_editor'] = true;
-                $validated['responsible_id'] = $user->id;
-            } else {
-                $validated['visible_only_to_editor'] = false;
-            }
+            $validated['visible_only_to_editor'] = $request->boolean('visible_only_to_editor', false);
         }
 
         $contact->update($validated);
