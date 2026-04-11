@@ -59,6 +59,13 @@ function getContactDisplayName(contact: Contact): string {
   return isPriest ? `Отец ${fullName}` : fullName;
 }
 
+function safeJoin(arr: any, separator = ', '): string {
+  if (!arr) return '-';
+  if (typeof arr === 'string') return arr || '-';
+  if (Array.isArray(arr)) return arr.join(separator);
+  return String(arr) || '-';
+}
+
 export default function ContactDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -406,7 +413,7 @@ export default function ContactDetailPage() {
                       ))}
                     </div>
                   ) : (
-                    <div>{contact.invitation_types?.join(', ') || '-'}</div>
+                    <div>{safeJoin(contact.invitation_types)}</div>
                   )}
                 </div>
               </div>
@@ -434,7 +441,7 @@ export default function ContactDetailPage() {
                       ))}
                     </div>
                   ) : (
-                    <div>{contact.required_invitations?.join(', ') || '-'}</div>
+                    <div>{safeJoin(contact.required_invitations)}</div>
                   )}
                 </div>
               </div>
