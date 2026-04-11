@@ -865,6 +865,20 @@ export default function ContactsPage() {
             {currentStep === 4 && (
               <div style={{ display: 'grid', gap: '1rem' }}>
                 <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Кто ответственный</label>
+                  <select
+                    value={newContact.responsible_id || ''}
+                    onChange={(e) => setNewContact({ ...newContact, responsible_id: e.target.value ? Number(e.target.value) : null })}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  >
+                    <option value="">Не выбрано</option>
+                    {responsibles.map(r => (
+                      <option key={r.id} value={r.id}>{r.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
                   <label style={{ display: 'block', marginBottom: '0.25rem' }}>Что дарили</label>
                   <textarea
                     value={newContact.gifts_given}
@@ -894,20 +908,6 @@ export default function ContactsPage() {
                       </label>
                     ))}
                   </div>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Кто ответственный</label>
-                  <select
-                    value={newContact.responsible_id || ''}
-                    onChange={(e) => setNewContact({ ...newContact, responsible_id: e.target.value ? Number(e.target.value) : null })}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  >
-                    <option value="">Не выбрано</option>
-                    {responsibles.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
                 </div>
 
                 <div>
