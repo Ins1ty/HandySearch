@@ -48,7 +48,6 @@ export default function ContactsPage() {
   } = useFilterStore();
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
   const [newContact, setNewContact] = useState({
     first_name: '',
     middle_name: '',
@@ -129,7 +128,6 @@ export default function ContactsPage() {
       tags: [], invitation_types: [], required_invitations: [], postal_address: '', region: null,
       visible_only_to_admin: false, visible_only_to_editor: false, gifts_given: '',
     });
-    setCurrentStep(1);
   };
 
   const handleCreateContact = async () => {
@@ -220,14 +218,6 @@ export default function ContactsPage() {
     if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
-
-  const nextStep = () => {
-    if (currentStep < TOTAL_STEPS) setCurrentStep(currentStep + 1);
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
-  };
 
   if (loading) {
     return (
@@ -607,14 +597,14 @@ export default function ContactsPage() {
             background: 'white',
             padding: '2rem',
             borderRadius: '8px',
-            maxWidth: '700px',
+            maxWidth: '800px',
             width: '90%',
             maxHeight: '90vh',
             overflow: 'auto'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
-                добавить контакт — шаг {currentStep} из {TOTAL_STEPS}
+                Добавить контакт
               </h2>
               <button
                 onClick={() => { setShowModal(false); resetForm(); }}
@@ -630,411 +620,370 @@ export default function ContactsPage() {
               </button>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              {[1, 2, 3, 4, 5].map(step => (
-                <div
-                  key={step}
-                  style={{
-                    flex: 1,
-                    height: '4px',
-                    borderRadius: '2px',
-                    background: step <= currentStep ? '#10b981' : '#e5e7eb'
-                  }}
-                />
-              ))}
-            </div>
+            <div style={{ display: 'grid', gap: '1.5rem' }}>
+              <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 'bold', marginBottom: '1rem', color: '#10b981' }}>1. Основное</h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Имя *</label>
+                      <input
+                        type="text"
+                        value={newContact.first_name}
+                        onChange={(e) => setNewContact({ ...newContact, first_name: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Отчество</label>
+                      <input
+                        type="text"
+                        value={newContact.middle_name}
+                        onChange={(e) => setNewContact({ ...newContact, middle_name: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Фамилия</label>
+                      <input
+                        type="text"
+                        value={newContact.last_name}
+                        onChange={(e) => setNewContact({ ...newContact, last_name: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
+                  </div>
 
-            {currentStep === 1 && (
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Имя *</label>
-                    <input
-                      type="text"
-                      value={newContact.first_name}
-                      onChange={(e) => setNewContact({ ...newContact, first_name: e.target.value })}
-                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                    />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Дата рождения</label>
+                      <input
+                        type="date"
+                        value={newContact.birthday}
+                        onChange={(e) => setNewContact({ ...newContact, birthday: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Место рождения</label>
+                      <input
+                        type="text"
+                        value={newContact.place_of_birth}
+                        onChange={(e) => setNewContact({ ...newContact, place_of_birth: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
                   </div>
+
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Отчество</label>
-                    <input
-                      type="text"
-                      value={newContact.middle_name}
-                      onChange={(e) => setNewContact({ ...newContact, middle_name: e.target.value })}
-                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                    />
+                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Теги</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {tags.map(tag => (
+                        <label key={tag.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={newContact.tags.includes(tag.id)}
+                            onChange={(e) => {
+                              const newTags = e.target.checked
+                                ? [...newContact.tags, tag.id]
+                                : newContact.tags.filter(t => t !== tag.id);
+                              setNewContact({ ...newContact, tags: newTags });
+                            }}
+                          />
+                          <span style={{ 
+                            background: tag.color + '20', 
+                            color: tag.color,
+                            padding: '0.125rem 0.375rem',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem'
+                          }}>
+                            {tag.name}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Фамилия</label>
-                    <input
-                      type="text"
-                      value={newContact.last_name}
-                      onChange={(e) => setNewContact({ ...newContact, last_name: e.target.value })}
-                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                    />
-                  </div>
+
+                  {user?.role === 'admin' && (
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Видимость</label>
+                      <select
+                        value={newContact.visible_only_to_admin ? 'admin' : newContact.visible_only_to_editor ? 'editor' : 'all'}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setNewContact({
+                            ...newContact,
+                            visible_only_to_admin: val === 'admin',
+                            visible_only_to_editor: val === 'editor'
+                          });
+                        }}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      >
+                        <option value="all">Все (видят все)</option>
+                        <option value="editor">Редактор + Админ</option>
+                        <option value="admin">Только Админ</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
+              </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Дата рождения</label>
-                    <input
-                      type="date"
-                      value={newContact.birthday}
-                      onChange={(e) => setNewContact({ ...newContact, birthday: e.target.value })}
-                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                    />
+              <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 'bold', marginBottom: '1rem', color: '#3b82f6' }}>2. Контакты</h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Телефон</label>
+                      <input
+                        type="text"
+                        value={newContact.phone}
+                        onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Email</label>
+                      <input
+                        type="email"
+                        value={newContact.email}
+                        onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Место рождения</label>
-                    <input
-                      type="text"
-                      value={newContact.place_of_birth}
-                      onChange={(e) => setNewContact({ ...newContact, place_of_birth: e.target.value })}
-                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Теги</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {tags.map(tag => (
-                      <label key={tag.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={newContact.tags.includes(tag.id)}
-                          onChange={(e) => {
-                            const newTags = e.target.checked
-                              ? [...newContact.tags, tag.id]
-                              : newContact.tags.filter(t => t !== tag.id);
-                            setNewContact({ ...newContact, tags: newTags });
-                          }}
-                        />
-                        <span style={{ 
-                          background: tag.color + '20', 
-                          color: tag.color,
-                          padding: '0.125rem 0.375rem',
-                          borderRadius: '4px',
-                          fontSize: '0.75rem'
-                        }}>
-                          {tag.name}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {user?.role === 'admin' && (
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Видимость</label>
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Город</label>
                     <select
-                      value={newContact.visible_only_to_admin ? 'admin' : newContact.visible_only_to_editor ? 'editor' : 'all'}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setNewContact({
-                          ...newContact,
-                          visible_only_to_admin: val === 'admin',
-                          visible_only_to_editor: val === 'editor'
-                        });
-                      }}
+                      value={newContact.region || ''}
+                      onChange={(e) => setNewContact({ ...newContact, region: e.target.value ? Number(e.target.value) : null })}
                       style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                     >
-                      <option value="all">Все (видят все)</option>
-                      <option value="editor">Редактор + Админ</option>
-                      <option value="admin">Только Админ</option>
+                      <option value="">Не выбран</option>
+                      {cities.map(city => (
+                        <option key={city.id} value={city.id}>{city.name}</option>
+                      ))}
                     </select>
                   </div>
-                )}
-              </div>
-            )}
 
-            {currentStep === 2 && (
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Телефон</label>
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Почтовый адрес (для писем)</label>
+                    <textarea
+                      value={newContact.postal_address}
+                      onChange={(e) => setNewContact({ ...newContact, postal_address: e.target.value })}
+                      placeholder="Индекс, город, улица, дом, квартира"
+                      rows={2}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Соцсети / Мессенджеры</label>
                     <input
                       type="text"
-                      value={newContact.phone}
-                      onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+                      value={newContact.social}
+                      onChange={(e) => setNewContact({ ...newContact, social: e.target.value })}
+                      placeholder="Telegram, VK, WhatsApp и т.д."
                       style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                     />
                   </div>
+
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Email</label>
-                    <input
-                      type="email"
-                      value={newContact.email}
-                      onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Приоритетная связь</label>
+                    <select
+                      value={newContact.priority_contact}
+                      onChange={(e) => setNewContact({ ...newContact, priority_contact: e.target.value as any })}
                       style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                    />
+                    >
+                      <option value="">Не выбрано</option>
+                      <option value="call">📞 Звонок</option>
+                      <option value="sms">💬 СМС</option>
+                      <option value="messenger">✉️ Мессенджер</option>
+                      <option value="email">📧 Почта</option>
+                    </select>
                   </div>
                 </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Город</label>
-                  <select
-                    value={newContact.region || ''}
-                    onChange={(e) => setNewContact({ ...newContact, region: e.target.value ? Number(e.target.value) : null })}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  >
-                    <option value="">Не выбран</option>
-                    {cities.map(city => (
-                      <option key={city.id} value={city.id}>{city.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Почтовый адрес (для писем)</label>
-                  <textarea
-                    value={newContact.postal_address}
-                    onChange={(e) => setNewContact({ ...newContact, postal_address: e.target.value })}
-                    placeholder="Индекс, город, улица, дом, квартира"
-                    rows={2}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Соцсети / Мессенджеры</label>
-                  <input
-                    type="text"
-                    value={newContact.social}
-                    onChange={(e) => setNewContact({ ...newContact, social: e.target.value })}
-                    placeholder="Telegram, VK, WhatsApp и т.д."
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Приоритетная связь</label>
-                  <select
-                    value={newContact.priority_contact}
-                    onChange={(e) => setNewContact({ ...newContact, priority_contact: e.target.value as any })}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  >
-                    <option value="">Не выбрано</option>
-                    <option value="call">📞 Звонок</option>
-                    <option value="sms">💬 СМС</option>
-                    <option value="messenger">✉️ Мессенджер</option>
-                    <option value="email">📧 Почта</option>
-                  </select>
-                </div>
               </div>
-            )}
 
-            {currentStep === 3 && (
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 'bold', marginBottom: '1rem', color: '#8b5cf6' }}>3. Служение</h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Место работы/служения</label>
+                      <input
+                        type="text"
+                        value={newContact.workplace}
+                        onChange={(e) => setNewContact({ ...newContact, workplace: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Должность/деятельность</label>
+                      <input
+                        type="text"
+                        value={newContact.position}
+                        onChange={(e) => setNewContact({ ...newContact, position: e.target.value })}
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Место работы/служения</label>
-                    <input
-                      type="text"
-                      value={newContact.workplace}
-                      onChange={(e) => setNewContact({ ...newContact, workplace: e.target.value })}
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Прошлые места службы</label>
+                    <textarea
+                      value={newContact.previous_workplaces}
+                      onChange={(e) => setNewContact({ ...newContact, previous_workplaces: e.target.value })}
+                      placeholder="Укажите прошлые места службы (каждое с новой строки)"
+                      rows={3}
                       style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                     />
                   </div>
+
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Должность/деятельность</label>
-                    <input
-                      type="text"
-                      value={newContact.position}
-                      onChange={(e) => setNewContact({ ...newContact, position: e.target.value })}
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Категория</label>
+                    <select
+                      value={newContact.category_id || ''}
+                      onChange={(e) => setNewContact({ ...newContact, category_id: e.target.value ? Number(e.target.value) : null })}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    >
+                      <option value="">Не выбрано</option>
+                      {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 'bold', marginBottom: '1rem', color: '#f59e0b' }}>4. Взаимодействие</h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Кто ответственный</label>
+                    <select
+                      value={newContact.responsible_id || ''}
+                      onChange={(e) => setNewContact({ ...newContact, responsible_id: e.target.value ? Number(e.target.value) : null })}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    >
+                      <option value="">Не выбрано</option>
+                      {responsibles.map(r => (
+                        <option key={r.id} value={r.id}>{r.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Что дарили</label>
+                    <textarea
+                      value={newContact.gifts_given}
+                      onChange={(e) => setNewContact({ ...newContact, gifts_given: e.target.value })}
+                      placeholder="Что дарили этому контакту"
+                      rows={2}
                       style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Прошлые места службы</label>
-                  <textarea
-                    value={newContact.previous_workplaces}
-                    onChange={(e) => setNewContact({ ...newContact, previous_workplaces: e.target.value })}
-                    placeholder="Укажите прошлые места службы (каждое с новой строки)"
-                    rows={3}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Категория</label>
-                  <select
-                    value={newContact.category_id || ''}
-                    onChange={(e) => setNewContact({ ...newContact, category_id: e.target.value ? Number(e.target.value) : null })}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  >
-                    <option value="">Не выбрано</option>
-                    {categories.map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {currentStep === 4 && (
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Кто ответственный</label>
-                  <select
-                    value={newContact.responsible_id || ''}
-                    onChange={(e) => setNewContact({ ...newContact, responsible_id: e.target.value ? Number(e.target.value) : null })}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  >
-                    <option value="">Не выбрано</option>
-                    {responsibles.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Что дарили</label>
-                  <textarea
-                    value={newContact.gifts_given}
-                    onChange={(e) => setNewContact({ ...newContact, gifts_given: e.target.value })}
-                    placeholder="Что дарили этому контакту"
-                    rows={2}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Куда приглашать</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {events.map(event => (
-                      <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={newContact.invitation_types.includes(event.title)}
-                          onChange={(e) => {
-                            const selected = e.target.checked
-                              ? [...newContact.invitation_types, event.title]
-                              : newContact.invitation_types.filter(t => t !== event.title);
-                            setNewContact({ ...newContact, invitation_types: selected });
-                          }}
-                        />
-                        <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
-                      </label>
-                    ))}
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Куда приглашать</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {events.map(event => (
+                        <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={newContact.invitation_types.includes(event.title)}
+                            onChange={(e) => {
+                              const selected = e.target.checked
+                                ? [...newContact.invitation_types, event.title]
+                                : newContact.invitation_types.filter(t => t !== event.title);
+                              setNewContact({ ...newContact, invitation_types: selected });
+                            }}
+                          />
+                          <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Обязательные приглашения</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {events.map(event => (
-                      <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={newContact.required_invitations.includes(event.title)}
-                          onChange={(e) => {
-                            const selected = e.target.checked
-                              ? [...newContact.required_invitations, event.title]
-                              : newContact.required_invitations.filter(t => t !== event.title);
-                            setNewContact({ ...newContact, required_invitations: selected });
-                          }}
-                        />
-                        <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
-                      </label>
-                    ))}
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Обязательные приглашения</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {events.map(event => (
+                        <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={newContact.required_invitations.includes(event.title)}
+                            onChange={(e) => {
+                              const selected = e.target.checked
+                                ? [...newContact.required_invitations, event.title]
+                                : newContact.required_invitations.filter(t => t !== event.title);
+                              setNewContact({ ...newContact, required_invitations: selected });
+                            }}
+                          />
+                          <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
 
-            {currentStep === 5 && (
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Краткое описание</label>
-                  <input
-                    type="text"
-                    value={newContact.short_description}
-                    onChange={(e) => setNewContact({ ...newContact, short_description: e.target.value })}
-                    placeholder="Краткое описание контакта"
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Подробное описание</label>
-                  <textarea
-                    value={newContact.full_description}
-                    onChange={(e) => setNewContact({ ...newContact, full_description: e.target.value })}
-                    placeholder="Подробное описание контакта"
-                    rows={6}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'space-between' }}>
               <div>
-                {currentStep > 1 && (
-                  <button
-                    onClick={prevStep}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      background: '#6b7280',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    ← Назад
-                  </button>
-                )}
+                <h3 style={{ fontSize: '0.875rem', fontWeight: 'bold', marginBottom: '1rem', color: '#ec4899' }}>5. Описание</h3>
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Краткое описание</label>
+                    <input
+                      type="text"
+                      value={newContact.short_description}
+                      onChange={(e) => setNewContact({ ...newContact, short_description: e.target.value })}
+                      placeholder="Краткое описание контакта"
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Подробное описание</label>
+                    <textarea
+                      value={newContact.full_description}
+                      onChange={(e) => setNewContact({ ...newContact, full_description: e.target.value })}
+                      placeholder="Подробное описание контакта"
+                      rows={6}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button
-                  onClick={() => { setShowModal(false); resetForm(); }}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    background: '#6b7280',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Отмена
-                </button>
-                <button
-                  onClick={handleCreateContact}
-                  disabled={saving || !newContact.first_name}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    background: saving ? '#ccc' : '#10b981',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: saving ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  {saving ? 'Сохранение...' : 'Сохранить'}
-                </button>
-                {currentStep < TOTAL_STEPS && (
-                  <button
-                    onClick={nextStep}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      background: '#3b82f6',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Далее →
-                  </button>
-                )}
-              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowModal(false); resetForm(); }}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Отмена
+              </button>
+              <button
+                onClick={handleCreateContact}
+                disabled={saving || !newContact.first_name}
+                style={{
+                  padding: '0.5rem 1rem',
+                  background: saving ? '#ccc' : '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: saving ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {saving ? 'Сохранение...' : 'Сохранить'}
+              </button>
             </div>
           </div>
         </div>
