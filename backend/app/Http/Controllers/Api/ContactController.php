@@ -36,10 +36,6 @@ class ContactController extends Controller
             });
         }
 
-        if ($request->has('region')) {
-            $query->where('region', 'like', "%{$request->region}%");
-        }
-
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -59,7 +55,7 @@ class ContactController extends Controller
         $sortBy = $request->get('sort_by', 'first_name');
         $sortOrder = $request->get('sort_order', 'asc');
         
-        if (in_array($sortBy, ['first_name', 'middle_name', 'last_name', 'region', 'birthday', 'created_at'])) {
+        if (in_array($sortBy, ['first_name', 'middle_name', 'last_name', 'birthday', 'created_at'])) {
             $query->orderBy($sortBy, $sortOrder === 'desc' ? 'desc' : 'asc');
         } else {
             $query->orderBy('first_name');
@@ -95,7 +91,6 @@ class ContactController extends Controller
             'invitation_types' => 'nullable|array',
             'required_invitations' => 'nullable|array',
             'postal_address' => 'nullable|string',
-            'region' => 'nullable|exists:cities,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
             'visible_only_to_admin' => 'nullable|boolean',
@@ -178,7 +173,6 @@ class ContactController extends Controller
             'invitation_types' => 'nullable|array',
             'required_invitations' => 'nullable|array',
             'postal_address' => 'nullable|string',
-            'region' => 'nullable|exists:cities,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
             'visible_only_to_admin' => 'nullable|boolean',

@@ -28,7 +28,6 @@ class Contact extends Model
         'invitation_types',
         'required_invitations',
         'postal_address',
-        'region',
         'visible_only_to_admin',
         'visible_only_to_editor',
         'gifts_given',
