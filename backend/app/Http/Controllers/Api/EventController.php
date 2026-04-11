@@ -46,7 +46,7 @@ class EventController extends Controller
             $query->where('invitation_types', 'like', '%' . $event->invitationType->name . '%');
         }
         
-        $contacts = $query->orderBy('name')->get();
+        $contacts = $query->orderBy('first_name')->get();
 
         return response()->json([
             'event' => $event,
