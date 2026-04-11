@@ -2,7 +2,9 @@ import * as XLSX from 'xlsx';
 
 interface Contact {
   id: number;
-  name: string;
+  first_name: string;
+  middle_name?: string;
+  last_name?: string;
   description?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
@@ -34,7 +36,9 @@ const priorityLabels: Record<string, string> = {
 
 export function exportContactsToExcel(contacts: Contact[], cities: { id: number; name: string }[]) {
   const data = contacts.map(contact => ({
-    'Имя': contact.name,
+    'Имя': contact.first_name || '',
+    'Отчество': contact.middle_name || '',
+    'Фамилия': contact.last_name || '',
     'Категория': contact.category?.name || '',
     'Теги': contact.tags?.map(t => t.name).join(', ') || '',
     'Связь': contact.priority_contact ? priorityLabels[contact.priority_contact] || '' : '',
@@ -58,7 +62,9 @@ export function exportContactsToExcel(contacts: Contact[], cities: { id: number;
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Контакты');
 
   const colWidths = [
-    { wch: 25 },
+    { wch: 15 },
+    { wch: 15 },
+    { wch: 15 },
     { wch: 15 },
     { wch: 20 },
     { wch: 12 },

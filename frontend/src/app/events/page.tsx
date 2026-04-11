@@ -5,6 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore, useDataStore, useFilterStore } from '@/store';
 import { eventsApi, categoriesApi, invitationTypesApi, contactsApi, authApi } from '@/lib/api';
 
+function getContactDisplayName(contact: any): string {
+  const isPriest = contact.tags?.some((t: any) => t.name.toLowerCase().includes('священник'));
+  const parts = [contact.first_name];
+  if (contact.middle_name) parts.push(contact.middle_name);
+  if (contact.last_name) parts.push(contact.last_name);
+  const fullName = parts.join(' ');
+  return isPriest ? `Отец ${fullName}` : fullName;
+}
+
 export default function EventsPage() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -328,7 +337,7 @@ export default function EventsPage() {
                             fontSize: '0.75rem'
                           }}
                         >
-                          {contact.name}
+                        {getContactDisplayName(contact)}
                         </span>
                       ))}
                       {event.contacts.length > 5 && (
@@ -435,7 +444,7 @@ export default function EventsPage() {
                           setNewEvent({ ...newEvent, contacts: newContacts });
                         }}
                       />
-                      <span style={{ fontSize: '0.875rem' }}>{contact.name}</span>
+                      <span style={{ fontSize: '0.875rem' }}>{getContactDisplayName(contact)}</span>
                     </label>
                   ))}
                 </div>

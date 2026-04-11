@@ -43,14 +43,15 @@ export const useAuthStore = create<AuthState>()(
 
 interface Contact {
   id: number;
-  name: string;
+  first_name: string;
+  middle_name?: string;
+  last_name?: string;
   description?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
   email?: string;
   social?: string;
   birthday?: string;
-  days_until_birthday?: number;
   responsible_id?: number;
   category_id?: number;
   category?: { id: number; name: string; color: string };

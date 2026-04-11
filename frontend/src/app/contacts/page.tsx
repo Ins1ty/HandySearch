@@ -20,6 +20,22 @@ const priorityLabels: Record<string, string> = {
   email: 'Почта',
 };
 
+function getContactDisplayName(contact: any): string {
+  const isPriest = contact.tags?.some((t: any) => t.name.toLowerCase().includes('священник'));
+  const parts = [contact.first_name];
+  if (contact.middle_name) parts.push(contact.middle_name);
+  if (contact.last_name) parts.push(contact.last_name);
+  const fullName = parts.join(' ');
+  return isPriest ? `Отец ${fullName}` : fullName;
+}
+
+function getFullNameForSearch(contact: any): string {
+  const parts = [contact.first_name || ''];
+  if (contact.middle_name) parts.push(contact.middle_name);
+  if (contact.last_name) parts.push(contact.last_name);
+  return parts.join(' ').toLowerCase();
+}
+
 export default function ContactsPage() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -31,7 +47,9 @@ export default function ContactsPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newContact, setNewContact] = useState({
-    name: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
     description: '',
     priority_contact: '' as '' | 'call' | 'sms' | 'messenger' | 'email',
     phone: '',
@@ -95,11 +113,13 @@ export default function ContactsPage() {
   };
 
   const handleCreateContact = async () => {
-    if (!newContact.name) return;
+    if (!newContact.first_name) return;
     setSaving(true);
     try {
       const dataToSend: any = {
-        name: newContact.name,
+        first_name: newContact.first_name,
+        middle_name: newContact.middle_name || undefined,
+        last_name: newContact.last_name || undefined,
         description: newContact.description || undefined,
         priority_contact: newContact.priority_contact || undefined,
         phone: newContact.phone || undefined,
@@ -126,7 +146,7 @@ export default function ContactsPage() {
       await contactsApi.create(dataToSend);
       setShowModal(false);
       setNewContact({
-        name: '', description: '', priority_contact: '',
+        first_name: '', middle_name: '', last_name: '', description: '', priority_contact: '',
         phone: '', email: '', social: '', birthday: '', category_id: null, responsible_id: null,
         tags: [], invitation_types: [], required_invitations: [], postal_address: '', region: null,
         visible_only_to_admin: false, visible_only_to_editor: false, gifts_given: ''
@@ -141,9 +161,12 @@ export default function ContactsPage() {
   };
 
   const filteredContacts = contacts.filter(contact => {
-    if (search && !contact.name.toLowerCase().includes(search.toLowerCase()) &&
-        !contact.description?.toLowerCase().includes(search.toLowerCase())) {
-      return false;
+    if (search) {
+      const fullNameSearch = getFullNameForSearch(contact);
+      const searchLower = search.toLowerCase();
+      if (!fullNameSearch.includes(searchLower) && !contact.description?.toLowerCase().includes(searchLower)) {
+        return false;
+      }
     }
     if (categoryId && contact.category_id !== categoryId) {
       return false;
@@ -164,11 +187,11 @@ export default function ContactsPage() {
     let aVal = '';
     let bVal = '';
     
-    if (sortBy === 'name') { aVal = a.name || ''; bVal = b.name || ''; }
+    if (sortBy === 'name') { aVal = a.first_name || ''; bVal = b.first_name || ''; }
     else if (sortBy === 'region') { aVal = a.region || ''; bVal = b.region || ''; }
     else if (sortBy === 'birthday') { aVal = a.birthday || ''; bVal = b.birthday || ''; }
     else if (sortBy === 'created_at') { aVal = a.created_at || ''; bVal = b.created_at || ''; }
-    else { aVal = a.name || ''; bVal = b.name || ''; }
+    else { aVal = a.first_name || ''; bVal = b.first_name || ''; }
     
     if (typeof aVal === 'string') aVal = aVal.toLowerCase();
     if (typeof bVal === 'string') bVal = bVal.toLowerCase();
@@ -469,7 +492,7 @@ export default function ContactsPage() {
                     onClick={() => router.push(`/contacts/${contact.id}`)}
                   >
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
-                      <strong>{contact.name}</strong>
+                      <strong>{getContactDisplayName(contact)}</strong>
                       {contact.description && (
                         <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.25rem' }}>
                           {contact.description.substring(0, 50)}...
@@ -519,18 +542,7 @@ export default function ContactsPage() {
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
                       {contact.birthday ? (
                         <div>
-                          <div>{new Date(contact.birthday).toLocaleDateString('ru-RU')}</div>
-                          {contact.days_until_birthday !== null && contact.days_until_birthday !== undefined && (
-                            <div style={{ 
-                              fontSize: '0.75rem', 
-                              color: contact.days_until_birthday <= 7 ? '#ef4444' : '#6b7280'
-                            }}>
-                              {contact.days_until_birthday === 0 
-                                ? 'Сегодня!' 
-                                : `Через ${contact.days_until_birthday} дн.`
-                              }
-                            </div>
-                          )}
+                          {new Date(contact.birthday).toLocaleDateString('ru-RU')}
                         </div>
                       ) : '-'}
                     </td>
@@ -576,14 +588,34 @@ export default function ContactsPage() {
             </h2>
             
             <div style={{ display: 'grid', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.25rem' }}>Имя *</label>
-                <input
-                  type="text"
-                  value={newContact.name}
-                  onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Имя *</label>
+                  <input
+                    type="text"
+                    value={newContact.first_name}
+                    onChange={(e) => setNewContact({ ...newContact, first_name: e.target.value })}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Отчество</label>
+                  <input
+                    type="text"
+                    value={newContact.middle_name}
+                    onChange={(e) => setNewContact({ ...newContact, middle_name: e.target.value })}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Фамилия</label>
+                  <input
+                    type="text"
+                    value={newContact.last_name}
+                    onChange={(e) => setNewContact({ ...newContact, last_name: e.target.value })}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  />
+                </div>
               </div>
 
               <div>
@@ -841,7 +873,7 @@ export default function ContactsPage() {
               </button>
               <button
                 onClick={handleCreateContact}
-                disabled={saving || !newContact.name}
+                disabled={saving || !newContact.first_name}
                 style={{
                   padding: '0.5rem 1rem',
                   background: saving ? '#ccc' : '#10b981',

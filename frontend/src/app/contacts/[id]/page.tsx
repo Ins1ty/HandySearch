@@ -21,26 +21,36 @@ const priorityLabels: Record<string, string> = {
 
 interface Contact {
   id: number;
-  name: string;
+  first_name: string;
+  middle_name?: string;
+  last_name?: string;
   description?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
   email?: string;
   social?: string;
   birthday?: string;
-  days_until_birthday?: number;
   responsible_id?: number;
   category_id?: number;
   category?: { id: number; name: string; color: string };
   responsible?: { id: number; name: string };
   tags?: { id: number; name: string; color: string }[];
-  invitation_types?: string;
-  required_invitations?: string;
+  invitation_types?: string[];
+  required_invitations?: string[];
   postal_address?: string;
   region?: number | string;
   visible_only_to_admin?: boolean;
   visible_only_to_editor?: boolean;
   gifts_given?: string;
+}
+
+function getContactDisplayName(contact: Contact): string {
+  const isPriest = contact.tags?.some(t => t.name.toLowerCase().includes('священник'));
+  const parts = [contact.first_name];
+  if (contact.middle_name) parts.push(contact.middle_name);
+  if (contact.last_name) parts.push(contact.last_name);
+  const fullName = parts.join(' ');
+  return isPriest ? `Отец ${fullName}` : fullName;
 }
 
 export default function ContactDetailPage() {
@@ -77,8 +87,8 @@ export default function ContactDetailPage() {
       setFormData({
         ...contactRes.data,
         tags: contactRes.data.tags?.map((t: any) => t.id) || [],
-        invitation_types: contactRes.data.invitation_types ? contactRes.data.invitation_types.split(',') : [],
-        required_invitations: contactRes.data.required_invitations ? contactRes.data.required_invitations.split(',') : [],
+        invitation_types: contactRes.data.invitation_types || [],
+        required_invitations: contactRes.data.required_invitations || [],
       });
       setCategories(categoriesRes.data);
       setTags(tagsRes.data);
@@ -189,14 +199,31 @@ export default function ContactDetailPage() {
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Имя</label>
                 {editing ? (
-                  <input
-                    type="text"
-                    value={formData.name || ''}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                  />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+                    <input
+                      type="text"
+                      value={formData.first_name || ''}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                      placeholder="Имя *"
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    />
+                    <input
+                      type="text"
+                      value={formData.middle_name || ''}
+                      onChange={(e) => setFormData({ ...formData, middle_name: e.target.value })}
+                      placeholder="Отчество"
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    />
+                    <input
+                      type="text"
+                      value={formData.last_name || ''}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                      placeholder="Фамилия"
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    />
+                  </div>
                 ) : (
-                  <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{contact.name}</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{getContactDisplayName(contact)}</div>
                 )}
               </div>
 
@@ -400,21 +427,7 @@ export default function ContactDetailPage() {
                 ) : (
                   <div>
                     {contact.birthday ? (
-                      <>
-                        <div>{new Date(contact.birthday).toLocaleDateString('ru-RU')}</div>
-                        {contact.days_until_birthday !== null && contact.days_until_birthday !== undefined && (
-                          <div style={{ 
-                            fontSize: '0.875rem', 
-                            color: contact.days_until_birthday <= 7 ? '#ef4444' : '#6b7280',
-                            marginTop: '0.25rem'
-                          }}>
-                            {contact.days_until_birthday === 0 
-                              ? 'Сегодня день рождения!' 
-                              : `День рождения через ${contact.days_until_birthday} дней`
-                            }
-                          </div>
-                        )}
-                      </>
+                      new Date(contact.birthday).toLocaleDateString('ru-RU')
                     ) : '-'}
                   </div>
                 )}
@@ -447,7 +460,7 @@ export default function ContactDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <div>{contact.invitation_types || '-'}</div>
+                  <div>{contact.invitation_types?.join(', ') || '-'}</div>
                 )}
               </div>
 
@@ -473,7 +486,7 @@ export default function ContactDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <div>{contact.required_invitations || '-'}</div>
+                  <div>{contact.required_invitations?.join(', ') || '-'}</div>
                 )}
               </div>
 
