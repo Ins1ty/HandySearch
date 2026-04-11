@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, useDataStore, useFilterStore } from '@/store';
 import { contactsApi, categoriesApi, tagsApi, responsiblesApi, authApi, eventsApi, citiesApi } from '@/lib/api';
+import { exportContactsToExcel } from '@/lib/export';
 
 const priorityIcons: Record<string, string> = {
   call: '📞',
@@ -229,6 +230,20 @@ export default function ContactsPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.875rem' }}>{user?.name}</span>
+          <button
+            onClick={() => exportContactsToExcel(sortedContacts, cities)}
+            style={{
+              padding: '0.5rem',
+              background: '#059669',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            ⬇ Excel
+          </button>
           {user?.role === 'admin' && (
             <>
               <button
