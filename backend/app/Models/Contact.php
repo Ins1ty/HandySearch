@@ -32,6 +32,7 @@ class Contact extends Model
         'visible_only_to_editor',
         'gifts_given',
         'region',
+        'is_priest',
     ];
 
     protected $casts = [

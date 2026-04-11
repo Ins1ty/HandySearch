@@ -48,15 +48,15 @@ interface Contact {
   visible_only_to_admin?: boolean;
   visible_only_to_editor?: boolean;
   gifts_given?: string;
+  is_priest?: boolean;
 }
 
 function getContactDisplayName(contact: Contact): string {
-  const isPriest = contact.tags?.some(t => t.name.toLowerCase().includes('священник'));
   const parts = [contact.first_name];
   if (contact.middle_name) parts.push(contact.middle_name);
   if (contact.last_name) parts.push(contact.last_name);
   const fullName = parts.join(' ');
-  return isPriest ? `Отец ${fullName}` : fullName;
+  return contact.is_priest ? `Отец ${fullName}` : fullName;
 }
 
 function safeJoin(arr: any, separator = ', '): string {
@@ -269,203 +269,17 @@ export default function ContactDetailPage() {
                 ) : (
                   <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
                     {contact.tags?.map(tag => (<span key={tag.id} style={{ background: tag.color + '20', color: tag.color, padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.875rem' }}>{tag.name}</span>))}
-                  </div>
-                )}
-              </div>
+</div>
+          )}
 
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Краткое описание</label>
-                {editing ? (
-                  <input type="text" value={formData.short_description || ''} onChange={(e) => setFormData({ ...formData, short_description: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                ) : (
-                  <div>{contact.short_description || '-'}</div>
-                )}
-              </div>
-
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Подробное описание</label>
-                {editing ? (
-                  <textarea value={formData.full_description || ''} onChange={(e) => setFormData({ ...formData, full_description: e.target.value })} rows={4} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                ) : (
-                  <div style={{ whiteSpace: 'pre-wrap' }}>{contact.full_description || '-'}</div>
-                )}
-              </div>
+          {editing && (
+            <div style={{ marginTop: '1.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1.5rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input type="checkbox" checked={formData.is_priest || false} onChange={(e) => setFormData({ ...formData, is_priest: e.target.checked })} />
+                <span>Священник</span>
+              </label>
             </div>
-
-            <div>
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Телефон</label>
-                {editing ? (
-                  <input type="tel" value={formData.phone || ''} onChange={(e) => setFormData({ ...formData, phone: formatPhone(e.target.value) })} placeholder="+7 (___) ___-__-__" style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                ) : (
-                  <div>{contact.phone || '-'}</div>
-                )}
-              </div>
-
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Email</label>
-                {editing ? (
-                  <input type="email" value={formData.email || ''} onChange={(e) => setFormData({ ...formData, email: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                ) : (
-                  <div>{contact.email || '-'}</div>
-                )}
-              </div>
-
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Соцсети / Мессенджеры</label>
-                {editing ? (
-                  <input type="text" value={formData.social || ''} onChange={(e) => setFormData({ ...formData, social: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                ) : (
-                  <div>{contact.social || '-'}</div>
-                )}
-              </div>
-
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Приоритетная связь</label>
-                {editing ? (
-                  <select value={formData.priority_contact || ''} onChange={(e) => setFormData({ ...formData, priority_contact: e.target.value || null })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-                    <option value="">Не выбрано</option>
-                    <option value="call">📞 Звонок</option>
-                    <option value="sms">💬 СМС</option>
-                    <option value="messenger">✉️ Мессенджер</option>
-                    <option value="email">📧 Почта</option>
-                  </select>
-                ) : (
-                  <div>{contact.priority_contact ? <span>{priorityIcons[contact.priority_contact]} {priorityLabels[contact.priority_contact]}</span> : '-'}</div>
-                )}
-              </div>
-
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Дата рождения</label>
-                {editing ? (
-                  <input type="date" value={formData.birthday || ''} onChange={(e) => setFormData({ ...formData, birthday: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                ) : (
-                  <div>{contact.birthday ? new Date(contact.birthday).toLocaleDateString('ru-RU') : '-'}</div>
-                )}
-              </div>
-
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Место рождения</label>
-                {editing ? (
-                  <input type="text" value={formData.place_of_birth || ''} onChange={(e) => setFormData({ ...formData, place_of_birth: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                ) : (
-                  <div>{contact.place_of_birth || '-'}</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '1.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1.5rem' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem' }}>Служение</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-              <div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Место работы/служения</label>
-                  {editing ? (
-                    <input type="text" value={formData.workplace || ''} onChange={(e) => setFormData({ ...formData, workplace: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                  ) : (
-                    <div>{contact.workplace || '-'}</div>
-                  )}
-                </div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Должность/деятельность</label>
-                  {editing ? (
-                    <input type="text" value={formData.position || ''} onChange={(e) => setFormData({ ...formData, position: e.target.value })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                  ) : (
-                    <div>{contact.position || '-'}</div>
-                  )}
-                </div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Прошлые места службы</label>
-                  {editing ? (
-                    <textarea value={formData.previous_workplaces || ''} onChange={(e) => setFormData({ ...formData, previous_workplaces: e.target.value })} rows={3} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                  ) : (
-                    <div style={{ whiteSpace: 'pre-wrap' }}>{contact.previous_workplaces || '-'}</div>
-                  )}
-                </div>
-              </div>
-              <div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Город</label>
-                  {editing ? (
-                    <select value={formData.region || ''} onChange={(e) => setFormData({ ...formData, region: e.target.value ? Number(e.target.value) : null })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-                      <option value="">Не выбран</option>
-                      {cities.map(city => (<option key={city.id} value={city.id}>{city.name}</option>))}
-                    </select>
-                  ) : (
-                    <div>{contact.region ? cities.find(c => c.id === Number(contact.region))?.name || '-' : '-'}</div>
-                  )}
-                </div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Почтовый адрес</label>
-                  {editing ? (
-                    <textarea value={formData.postal_address || ''} onChange={(e) => setFormData({ ...formData, postal_address: e.target.value })} rows={2} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                  ) : (
-                    <div style={{ whiteSpace: 'pre-wrap' }}>{contact.postal_address || '-'}</div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '1.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1.5rem' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem' }}>Взаимодействие</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-              <div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Что дарили</label>
-                  {editing ? (
-                    <textarea value={formData.gifts_given || ''} onChange={(e) => setFormData({ ...formData, gifts_given: e.target.value })} rows={2} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
-                  ) : (
-                    <div style={{ whiteSpace: 'pre-wrap' }}>{contact.gifts_given || '-'}</div>
-                  )}
-                </div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Куда приглашать</label>
-                  {editing ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {allEvents.map(event => (
-                        <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={(formData.invitation_types as string[] || []).includes(event.title)} onChange={(e) => { const current = formData.invitation_types as string[] || []; const selected = e.target.checked ? [...current, event.title] : current.filter(t => t !== event.title); setFormData({ ...formData, invitation_types: selected }); }} />
-                          <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
-                        </label>
-                      ))}
-                    </div>
-                  ) : (
-                    <div>{safeJoin(contact.invitation_types)}</div>
-                  )}
-                </div>
-              </div>
-              <div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Кто ответственный</label>
-                  {editing ? (
-                    <select value={formData.responsible_id || ''} onChange={(e) => setFormData({ ...formData, responsible_id: e.target.value ? Number(e.target.value) : null })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-                      <option value="">Не выбран</option>
-                      {responsibles.map(r => (<option key={r.id} value={r.id}>{r.name}</option>))}
-                    </select>
-                  ) : (
-                    <div>{contact.responsible?.name || '-'}</div>
-                  )}
-                </div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Обязательные приглашения</label>
-                  {editing ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {allEvents.map(event => (
-                        <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={(formData.required_invitations as string[] || []).includes(event.title)} onChange={(e) => { const current = formData.required_invitations as string[] || []; const selected = e.target.checked ? [...current, event.title] : current.filter(t => t !== event.title); setFormData({ ...formData, required_invitations: selected }); }} />
-                          <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
-                        </label>
-                      ))}
-                    </div>
-                  ) : (
-                    <div>{safeJoin(contact.required_invitations)}</div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
 
           {editing && user?.role === 'admin' && (
             <div style={{ marginTop: '1.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1.5rem' }}>

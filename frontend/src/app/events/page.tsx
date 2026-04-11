@@ -6,12 +6,11 @@ import { useAuthStore, useDataStore, useFilterStore } from '@/store';
 import { eventsApi, categoriesApi, invitationTypesApi, contactsApi, authApi } from '@/lib/api';
 
 function getContactDisplayName(contact: any): string {
-  const isPriest = contact.tags?.some((t: any) => t.name.toLowerCase().includes('священник'));
   const parts = [contact.first_name];
   if (contact.middle_name) parts.push(contact.middle_name);
   if (contact.last_name) parts.push(contact.last_name);
   const fullName = parts.join(' ');
-  return isPriest ? `Отец ${fullName}` : fullName;
+  return contact.is_priest ? `Отец ${fullName}` : fullName;
 }
 
 export default function EventsPage() {

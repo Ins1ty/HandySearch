@@ -21,12 +21,11 @@ const priorityLabels: Record<string, string> = {
 };
 
 function getContactDisplayName(contact: any): string {
-  const isPriest = contact.tags?.some((t: any) => t.name.toLowerCase().includes('священник'));
   const parts = [contact.first_name];
   if (contact.middle_name) parts.push(contact.middle_name);
   if (contact.last_name) parts.push(contact.last_name);
   const fullName = parts.join(' ');
-  return isPriest ? `Отец ${fullName}` : fullName;
+  return contact.is_priest ? `Отец ${fullName}` : fullName;
 }
 
 function getFullNameForSearch(contact: any): string {
@@ -81,6 +80,7 @@ export default function ContactsPage() {
     visible_only_to_admin: false,
     visible_only_to_editor: false,
     gifts_given: '',
+    is_priest: false,
   });
   const [saving, setSaving] = useState(false);
 
@@ -133,7 +133,7 @@ export default function ContactsPage() {
       priority_contact: '', phone: '', email: '', social: '', birthday: '', place_of_birth: '',
       workplace: '', position: '', previous_workplaces: '', category_id: null, responsible_id: null,
       tags: [], invitation_types: [], required_invitations: [], postal_address: '', region: null,
-      visible_only_to_admin: false, visible_only_to_editor: false, gifts_given: '',
+      visible_only_to_admin: false, visible_only_to_editor: false, gifts_given: '', is_priest: false,
     });
   };
 
@@ -165,6 +165,7 @@ export default function ContactsPage() {
         postal_address: newContact.postal_address || undefined,
         region: newContact.region || undefined,
         gifts_given: newContact.gifts_given || undefined,
+        is_priest: newContact.is_priest,
       };
       
       if (user?.role === 'admin') {
@@ -709,6 +710,17 @@ export default function ContactsPage() {
                         </label>
                       ))}
                     </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={newContact.is_priest}
+                        onChange={(e) => setNewContact({ ...newContact, is_priest: e.target.checked })}
+                      />
+                      <span style={{ fontSize: '0.875rem' }}>Священник</span>
+                    </label>
                   </div>
 
                   {user?.role === 'admin' && (

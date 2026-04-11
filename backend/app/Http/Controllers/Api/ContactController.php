@@ -97,6 +97,7 @@ class ContactController extends Controller
             'visible_only_to_editor' => 'nullable|boolean',
             'gifts_given' => 'nullable|string',
             'region' => 'nullable|exists:cities,id',
+            'is_priest' => 'nullable|boolean',
         ]);
 
         $validated['invitation_types'] = $request->has('invitation_types') ? implode(',', $request->invitation_types) : null;
@@ -180,6 +181,7 @@ class ContactController extends Controller
             'visible_only_to_editor' => 'nullable|boolean',
             'gifts_given' => 'nullable|string',
             'region' => 'nullable|exists:cities,id',
+            'is_priest' => 'nullable|boolean',
         ]);
 
         if ($request->has('invitation_types')) {
