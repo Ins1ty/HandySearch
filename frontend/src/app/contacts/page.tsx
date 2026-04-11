@@ -774,6 +774,20 @@ export default function ContactsPage() {
                 </div>
 
                 <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem' }}>Город</label>
+                  <select
+                    value={newContact.region || ''}
+                    onChange={(e) => setNewContact({ ...newContact, region: e.target.value ? Number(e.target.value) : null })}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                  >
+                    <option value="">Не выбран</option>
+                    {cities.map(city => (
+                      <option key={city.id} value={city.id}>{city.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
                   <label style={{ display: 'block', marginBottom: '0.25rem' }}>Почтовый адрес (для писем)</label>
                   <textarea
                     value={newContact.postal_address}
