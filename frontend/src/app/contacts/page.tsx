@@ -36,7 +36,14 @@ function getFullNameForSearch(contact: any): string {
   return parts.join(' ').toLowerCase();
 }
 
-const TOTAL_STEPS = 5;
+function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 10);
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `+7 (${digits}`;
+  if (digits.length <= 6) return `+7 (${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  if (digits.length <= 8) return `+7 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  return `+7 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 8)}-${digits.slice(8, 10)}`;
+}
 
 export default function ContactsPage() {
   const router = useRouter();
@@ -735,9 +742,10 @@ export default function ContactsPage() {
                     <div>
                       <label style={{ display: 'block', marginBottom: '0.25rem' }}>Телефон</label>
                       <input
-                        type="text"
+                        type="tel"
                         value={newContact.phone}
-                        onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+                        onChange={(e) => setNewContact({ ...newContact, phone: formatPhone(e.target.value) })}
+                        placeholder="+7 (___) ___-__-__"
                         style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                       />
                     </div>
