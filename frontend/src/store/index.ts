@@ -47,11 +47,17 @@ interface Contact {
   middle_name?: string;
   last_name?: string;
   description?: string;
+  short_description?: string;
+  full_description?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
   email?: string;
   social?: string;
   birthday?: string;
+  place_of_birth?: string;
+  workplace?: string;
+  position?: string;
+  previous_workplaces?: string;
   responsible_id?: number;
   category_id?: number;
   category?: { id: number; name: string; color: string };

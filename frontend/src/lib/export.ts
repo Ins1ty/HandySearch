@@ -6,11 +6,17 @@ interface Contact {
   middle_name?: string;
   last_name?: string;
   description?: string;
+  short_description?: string;
+  full_description?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
   email?: string;
   social?: string;
   birthday?: string;
+  place_of_birth?: string;
+  workplace?: string;
+  position?: string;
+  previous_workplaces?: string;
   responsible_id?: number;
   category_id?: number;
   category?: { id: number; name: string; color: string };
@@ -39,20 +45,25 @@ export function exportContactsToExcel(contacts: Contact[], cities: { id: number;
     'Имя': contact.first_name || '',
     'Отчество': contact.middle_name || '',
     'Фамилия': contact.last_name || '',
+    'Дата рождения': contact.birthday ? new Date(contact.birthday).toLocaleDateString('ru-RU') : '',
+    'Место рождения': contact.place_of_birth || '',
     'Категория': contact.category?.name || '',
     'Теги': contact.tags?.map(t => t.name).join(', ') || '',
-    'Связь': contact.priority_contact ? priorityLabels[contact.priority_contact] || '' : '',
-    'Регион': contact.region ? cities.find(c => c.id === Number(contact.region))?.name || '' : '',
     'Телефон': contact.phone || '',
     'Email': contact.email || '',
-    'Дата рождения': contact.birthday ? new Date(contact.birthday).toLocaleDateString('ru-RU') : '',
-    'Ответственный': contact.responsible?.name || '',
-    'Описание': contact.description || '',
-    'Соцсети': contact.social || '',
-    'Приглашать на события': contact.invitation_types?.join(', ') || '',
-    'Обязательные приглашения': contact.required_invitations?.join(', ') || '',
-    'Что дарили': contact.gifts_given || '',
     'Почтовый адрес': contact.postal_address || '',
+    'Соцсети': contact.social || '',
+    'Приоритетная связь': contact.priority_contact ? priorityLabels[contact.priority_contact] || '' : '',
+    'Место работы/служения': contact.workplace || '',
+    'Должность/деятельность': contact.position || '',
+    'Прошлые места службы': contact.previous_workplaces || '',
+    'Краткое описание': contact.short_description || '',
+    'Подробное описание': contact.full_description || '',
+    'Что дарили': contact.gifts_given || '',
+    'Куда приглашать': contact.invitation_types?.join(', ') || '',
+    'Кто ответственный': contact.responsible?.name || '',
+    'Обязательные приглашения': contact.required_invitations?.join(', ') || '',
+    'Регион': contact.region ? cities.find(c => c.id === Number(contact.region))?.name || '' : '',
     'Дата создания': contact.created_at ? new Date(contact.created_at).toLocaleDateString('ru-RU') : '',
   }));
 
@@ -65,20 +76,25 @@ export function exportContactsToExcel(contacts: Contact[], cities: { id: number;
     { wch: 15 },
     { wch: 15 },
     { wch: 15 },
+    { wch: 12 },
+    { wch: 20 },
     { wch: 15 },
+    { wch: 20 },
+    { wch: 20 },
+    { wch: 25 },
+    { wch: 30 },
     { wch: 20 },
     { wch: 12 },
-    { wch: 15 },
-    { wch: 20 },
     { wch: 25 },
-    { wch: 15 },
-    { wch: 20 },
+    { wch: 25 },
+    { wch: 25 },
     { wch: 30 },
-    { wch: 20 },
+    { wch: 40 },
     { wch: 25 },
     { wch: 25 },
     { wch: 20 },
-    { wch: 30 },
+    { wch: 25 },
+    { wch: 15 },
     { wch: 12 },
   ];
   worksheet['!cols'] = colWidths;

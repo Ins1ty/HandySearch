@@ -46,9 +46,13 @@ class ContactController extends Controller
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('middle_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('short_description', 'like', "%{$search}%")
+                    ->orWhere('full_description', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('workplace', 'like', "%{$search}%")
+                    ->orWhere('position', 'like', "%{$search}%");
             });
         }
 
@@ -75,11 +79,17 @@ class ContactController extends Controller
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'short_description' => 'nullable|string|max:255',
+            'full_description' => 'nullable|string',
             'priority_contact' => 'nullable|in:call,sms,messenger,email',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'social' => 'nullable|string',
             'birthday' => 'nullable|date',
+            'place_of_birth' => 'nullable|string|max:255',
+            'workplace' => 'nullable|string|max:255',
+            'position' => 'nullable|string|max:255',
+            'previous_workplaces' => 'nullable|string',
             'responsible_id' => 'nullable|exists:responsibles,id',
             'category_id' => 'nullable|exists:categories,id',
             'invitation_types' => 'nullable|array',
@@ -152,11 +162,17 @@ class ContactController extends Controller
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'short_description' => 'nullable|string|max:255',
+            'full_description' => 'nullable|string',
             'priority_contact' => 'nullable|in:call,sms,messenger,email',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'social' => 'nullable|string',
             'birthday' => 'nullable|date',
+            'place_of_birth' => 'nullable|string|max:255',
+            'workplace' => 'nullable|string|max:255',
+            'position' => 'nullable|string|max:255',
+            'previous_workplaces' => 'nullable|string',
             'responsible_id' => 'nullable|exists:responsibles,id',
             'category_id' => 'nullable|exists:categories,id',
             'invitation_types' => 'nullable|array',
