@@ -1005,7 +1005,21 @@ export default function ContactsPage() {
                 >
                   Отмена
                 </button>
-                {currentStep < TOTAL_STEPS ? (
+                <button
+                  onClick={handleCreateContact}
+                  disabled={saving || !newContact.first_name}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: saving ? '#ccc' : '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: saving ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {saving ? 'Сохранение...' : 'Сохранить'}
+                </button>
+                {currentStep < TOTAL_STEPS && (
                   <button
                     onClick={nextStep}
                     style={{
@@ -1018,21 +1032,6 @@ export default function ContactsPage() {
                     }}
                   >
                     Далее →
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleCreateContact}
-                    disabled={saving || !newContact.first_name}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      background: saving ? '#ccc' : '#10b981',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: saving ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    {saving ? 'Сохранение...' : 'Сохранить'}
                   </button>
                 )}
               </div>
