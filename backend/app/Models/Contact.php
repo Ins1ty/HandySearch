@@ -26,7 +26,6 @@ class Contact extends Model
         'responsible_id',
         'category_id',
         'invitation_types',
-        'required_invitations',
         'postal_address',
         'visible_only_to_admin',
         'visible_only_to_editor',

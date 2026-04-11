@@ -74,7 +74,6 @@ export default function ContactsPage() {
     responsible_id: null as number | null,
     tags: [] as number[],
     invitation_types: [] as string[],
-    required_invitations: [] as string[],
     postal_address: '',
     region: null as number | null,
     visible_only_to_admin: false,
@@ -132,7 +131,7 @@ export default function ContactsPage() {
       first_name: '', middle_name: '', last_name: '', description: '', short_description: '', full_description: '',
       priority_contact: '', phone: '', email: '', social: '', birthday: '', place_of_birth: '',
       workplace: '', position: '', previous_workplaces: '', category_id: null, responsible_id: null,
-      tags: [], invitation_types: [], required_invitations: [], postal_address: '', region: null,
+      tags: [], invitation_types: [], postal_address: '', region: null,
       visible_only_to_admin: false, visible_only_to_editor: false, gifts_given: '', is_priest: false,
     });
   };
@@ -161,7 +160,6 @@ export default function ContactsPage() {
         responsible_id: newContact.responsible_id || undefined,
         tags: newContact.tags.length > 0 ? newContact.tags : undefined,
         invitation_types: newContact.invitation_types.length > 0 ? newContact.invitation_types : undefined,
-        required_invitations: newContact.required_invitations.length > 0 ? newContact.required_invitations : undefined,
         postal_address: newContact.postal_address || undefined,
         region: newContact.region || undefined,
         gifts_given: newContact.gifts_given || undefined,
@@ -917,27 +915,6 @@ export default function ContactsPage() {
                                 ? [...newContact.invitation_types, event.title]
                                 : newContact.invitation_types.filter(t => t !== event.title);
                               setNewContact({ ...newContact, invitation_types: selected });
-                            }}
-                          />
-                          <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Обязательные приглашения</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {events.map(event => (
-                        <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                          <input
-                            type="checkbox"
-                            checked={newContact.required_invitations.includes(event.title)}
-                            onChange={(e) => {
-                              const selected = e.target.checked
-                                ? [...newContact.required_invitations, event.title]
-                                : newContact.required_invitations.filter(t => t !== event.title);
-                              setNewContact({ ...newContact, required_invitations: selected });
                             }}
                           />
                           <span style={{ fontSize: '0.875rem' }}>{event.title}</span>

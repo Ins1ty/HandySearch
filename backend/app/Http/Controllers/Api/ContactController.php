@@ -89,7 +89,6 @@ class ContactController extends Controller
             'responsible_id' => 'nullable|exists:responsibles,id',
             'category_id' => 'nullable|exists:categories,id',
             'invitation_types' => 'nullable|array',
-            'required_invitations' => 'nullable|array',
             'postal_address' => 'nullable|string',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
@@ -101,7 +100,6 @@ class ContactController extends Controller
         ]);
 
         $validated['invitation_types'] = $request->has('invitation_types') ? implode(',', $request->invitation_types) : null;
-        $validated['required_invitations'] = $request->has('required_invitations') ? implode(',', $request->required_invitations) : null;
 
         if ($user->role === 'admin') {
             $validated['visible_only_to_admin'] = $request->boolean('visible_only_to_admin', false);
@@ -173,7 +171,6 @@ class ContactController extends Controller
             'responsible_id' => 'nullable|exists:responsibles,id',
             'category_id' => 'nullable|exists:categories,id',
             'invitation_types' => 'nullable|array',
-            'required_invitations' => 'nullable|array',
             'postal_address' => 'nullable|string',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
@@ -186,9 +183,6 @@ class ContactController extends Controller
 
         if ($request->has('invitation_types')) {
             $validated['invitation_types'] = implode(',', $request->invitation_types);
-        }
-        if ($request->has('required_invitations')) {
-            $validated['required_invitations'] = implode(',', $request->required_invitations);
         }
 
         if ($user->role === 'admin') {
