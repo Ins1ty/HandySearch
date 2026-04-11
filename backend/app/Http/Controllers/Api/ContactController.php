@@ -14,16 +14,13 @@ class ContactController extends Controller
         $user = Auth::user();
         $query = Contact::with(['category', 'responsible', 'tags']);
 
-        // Admin sees everything
         if ($user->role !== 'admin') {
             $query->where('visible_only_to_admin', false);
         }
         
-        // Viewer only sees public contacts (visible_only_to_editor = false)
         if ($user->role === 'viewer') {
             $query->where('visible_only_to_editor', false);
         }
-        // Editor sees: public + all contacts visible to editors (handled by first filter already)
 
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
@@ -39,10 +36,6 @@ class ContactController extends Controller
             });
         }
 
-        if ($request->has('is_priest')) {
-            $query->where('is_priest', $request->boolean('is_priest'));
-        }
-
         if ($request->has('region')) {
             $query->where('region', 'like', "%{$request->region}%");
         }
@@ -50,21 +43,22 @@ class ContactController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('father_name', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        $sortBy = $request->get('sort_by', 'name');
+        $sortBy = $request->get('sort_by', 'first_name');
         $sortOrder = $request->get('sort_order', 'asc');
         
-        if (in_array($sortBy, ['name', 'region', 'birthday', 'created_at'])) {
+        if (in_array($sortBy, ['first_name', 'middle_name', 'last_name', 'region', 'birthday', 'created_at'])) {
             $query->orderBy($sortBy, $sortOrder === 'desc' ? 'desc' : 'asc');
         } else {
-            $query->orderBy('name');
+            $query->orderBy('first_name');
         }
 
         $contacts = $query->get();
@@ -77,10 +71,10 @@ class ContactController extends Controller
         $user = Auth::user();
         
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'is_priest' => 'nullable|boolean',
-            'father_name' => 'nullable|string|max:255',
             'priority_contact' => 'nullable|in:call,sms,messenger,email',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
@@ -154,10 +148,10 @@ class ContactController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
+            'first_name' => 'sometimes|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'is_priest' => 'nullable|boolean',
-            'father_name' => 'nullable|string|max:255',
             'priority_contact' => 'nullable|in:call,sms,messenger,email',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',

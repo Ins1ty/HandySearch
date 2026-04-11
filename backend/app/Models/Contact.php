@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Contact extends Model
 {
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
         'description',
-        'is_priest',
-        'father_name',
         'priority_contact',
         'phone',
         'email',
@@ -30,7 +30,6 @@ class Contact extends Model
 
     protected $casts = [
         'birthday' => 'date',
-        'is_priest' => 'boolean',
     ];
 
     public function responsible()
@@ -53,22 +52,6 @@ class Contact extends Model
         return $this->belongsToMany(Event::class, 'event_contacts')
             ->withPivot('gift_id')
             ->withTimestamps();
-    }
-
-    public function getDaysUntilBirthdayAttribute()
-    {
-        if (!$this->birthday) {
-            return null;
-        }
-
-        $today = Carbon::today();
-        $birthday = $this->birthday->copy()->year($today->year);
-
-        if ($birthday->isPast()) {
-            $birthday->addYear();
-        }
-
-        return $today->diffInDays($birthday);
     }
 
     public function gifts()
