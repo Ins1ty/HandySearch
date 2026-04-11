@@ -9,14 +9,14 @@ interface Contact {
   email?: string;
   social?: string;
   birthday?: string;
-  days_until_birthday?: number;
   responsible_id?: number;
   category_id?: number;
   category?: { id: number; name: string; color: string };
   responsible?: { id: number; name: string; phone?: string; email?: string };
   tags?: { id: number; name: string; color: string }[];
-  invitation_types?: string;
-  required_invitations?: string;
+  invitation_types?: string[];
+  required_invitations?: string[];
+  gifts_given?: string;
   postal_address?: string;
   region?: string;
   visible_only_to_admin?: boolean;
@@ -42,10 +42,12 @@ export function exportContactsToExcel(contacts: Contact[], cities: { id: number;
     'Телефон': contact.phone || '',
     'Email': contact.email || '',
     'Дата рождения': contact.birthday ? new Date(contact.birthday).toLocaleDateString('ru-RU') : '',
-    'Дней до ДР': contact.days_until_birthday ?? '',
     'Ответственный': contact.responsible?.name || '',
     'Описание': contact.description || '',
     'Соцсети': contact.social || '',
+    'Приглашать на события': contact.invitation_types?.join(', ') || '',
+    'Обязательные приглашения': contact.required_invitations?.join(', ') || '',
+    'Что дарили': contact.gifts_given || '',
     'Почтовый адрес': contact.postal_address || '',
     'Дата создания': contact.created_at ? new Date(contact.created_at).toLocaleDateString('ru-RU') : '',
   }));
@@ -63,13 +65,14 @@ export function exportContactsToExcel(contacts: Contact[], cities: { id: number;
     { wch: 15 },
     { wch: 20 },
     { wch: 25 },
-    { wch: 12 },
-    { wch: 10 },
+    { wch: 15 },
     { wch: 20 },
     { wch: 30 },
     { wch: 20 },
-    { wch: 30 },
+    { wch: 25 },
+    { wch: 25 },
     { wch: 20 },
+    { wch: 30 },
     { wch: 12 },
   ];
   worksheet['!cols'] = colWidths;
