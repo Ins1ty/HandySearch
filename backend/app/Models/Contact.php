@@ -31,6 +31,7 @@ class Contact extends Model
         'visible_only_to_admin',
         'visible_only_to_editor',
         'gifts_given',
+        'region',
     ];
 
     protected $casts = [
