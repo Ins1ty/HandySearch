@@ -121,18 +121,6 @@ export default function LoginPage() {
             {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
-
-        <div style={{ 
-          marginTop: '1rem', 
-          textAlign: 'center',
-          fontSize: '0.875rem',
-          color: '#666'
-        }}>
-          <p>Тестовые аккаунты:</p>
-          <p>admin@handysearch.local / admin123</p>
-          <p>editor@handysearch.local / editor123</p>
-          <p>viewer@handysearch.local / viewer123</p>
-        </div>
       </div>
     </div>
   );
