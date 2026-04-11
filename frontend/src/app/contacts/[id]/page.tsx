@@ -110,8 +110,12 @@ export default function ContactDetailPage() {
       setFormData({
         ...contactRes.data,
         tags: contactRes.data.tags?.map((t: any) => t.id) || [],
-        invitation_types: contactRes.data.invitation_types || [],
-        required_invitations: contactRes.data.required_invitations || [],
+        invitation_types: typeof contactRes.data.invitation_types === 'string'
+          ? contactRes.data.invitation_types.split(',').filter(Boolean)
+          : (contactRes.data.invitation_types || []),
+        required_invitations: typeof contactRes.data.required_invitations === 'string'
+          ? contactRes.data.required_invitations.split(',').filter(Boolean)
+          : (contactRes.data.required_invitations || []),
       });
       setCategories(categoriesRes.data);
       setTags(tagsRes.data);
@@ -137,7 +141,13 @@ export default function ContactDetailPage() {
 
   const handleSave = async () => {
     try {
-      await contactsApi.update(Number(params.id), formData);
+      const dataToSend = {
+        ...formData,
+        invitation_types: Array.isArray(formData.invitation_types) ? formData.invitation_types : [],
+        required_invitations: Array.isArray(formData.required_invitations) ? formData.required_invitations : [],
+        tags: Array.isArray(formData.tags) ? formData.tags : [],
+      };
+      await contactsApi.update(Number(params.id), dataToSend);
       setEditing(false);
       loadData();
     } catch (error) {
