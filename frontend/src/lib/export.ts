@@ -40,15 +40,22 @@ const priorityLabels: Record<string, string> = {
   email: 'Почта',
 };
 
-export function exportContactsToExcel(contacts: Contact[], cities: { id: number; name: string }[]) {
-  const data = contacts.map(contact => ({
+export function exportContactsToExcel(contacts: any[], cities: { id: number; name: string }[]) {
+  const safeJoin = (arr: any[] | string | undefined | null, separator = ', '): string => {
+    if (!arr) return '';
+    if (typeof arr === 'string') return arr;
+    if (Array.isArray(arr)) return arr.join(separator);
+    return String(arr);
+  };
+
+  const data = contacts.map((contact: any) => ({
     'Имя': contact.first_name || '',
     'Отчество': contact.middle_name || '',
     'Фамилия': contact.last_name || '',
     'Дата рождения': contact.birthday ? new Date(contact.birthday).toLocaleDateString('ru-RU') : '',
     'Место рождения': contact.place_of_birth || '',
     'Категория': contact.category?.name || '',
-    'Теги': Array.isArray(contact.tags) ? contact.tags.map(t => t.name).join(', ') : '',
+    'Теги': safeJoin(contact.tags?.map ? contact.tags.map((t: any) => t.name) : contact.tags),
     'Приоритетная связь': contact.priority_contact ? priorityLabels[contact.priority_contact] || '' : '',
     'Место работы/служения': contact.workplace || '',
     'Должность/деятельность': contact.position || '',
@@ -56,10 +63,10 @@ export function exportContactsToExcel(contacts: Contact[], cities: { id: number;
     'Краткое описание': contact.short_description || '',
     'Подробное описание': contact.full_description || '',
     'Что дарили': contact.gifts_given || '',
-    'Куда приглашать': typeof contact.invitation_types === 'string' ? contact.invitation_types : (Array.isArray(contact.invitation_types) ? contact.invitation_types.join(', ') : ''),
+    'Куда приглашать': safeJoin(contact.invitation_types),
     'Кто ответственный': contact.responsible?.name || '',
-    'Обязательные приглашения': typeof contact.required_invitations === 'string' ? contact.required_invitations : (Array.isArray(contact.required_invitations) ? contact.required_invitations.join(', ') : ''),
-    'Регион': contact.region ? cities.find(c => c.id === Number(contact.region))?.name || '' : '',
+    'Обязательные приглашения': safeJoin(contact.required_invitations),
+    'Регион': contact.region ? String(cities.find(c => c.id === Number(contact.region))?.name || '') : '',
     'Дата создания': contact.created_at ? new Date(contact.created_at).toLocaleDateString('ru-RU') : '',
   }));
 
