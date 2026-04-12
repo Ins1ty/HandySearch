@@ -62,9 +62,9 @@ interface Contact {
   category_id?: number;
   category?: { id: number; name: string; color: string };
   responsible?: { id: number; name: string; phone?: string; email?: string };
+  responsibles?: { id: number; name: string; phone?: string; email?: string }[];
   tags?: { id: number; name: string; color: string }[];
-  invitation_types?: string[];
-  required_invitations?: string[];
+  invitation_type_ids?: number[];
   gifts_given?: string;
   postal_address?: string;
   region?: string;
