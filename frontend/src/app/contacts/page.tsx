@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, useDataStore, useFilterStore } from '@/store';
-import { contactsApi, categoriesApi, tagsApi, responsiblesApi, authApi, eventsApi, citiesApi } from '@/lib/api';
+import { contactsApi, categoriesApi, tagsApi, responsiblesApi, authApi, invitationTypesApi, citiesApi } from '@/lib/api';
 import { exportContactsToExcel } from '@/lib/export';
 
 const priorityIcons: Record<string, string> = {
@@ -47,7 +47,7 @@ function formatPhone(value: string): string {
 export default function ContactsPage() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { contacts, categories, tags, responsibles, events, cities, setContacts, setCategories, setTags, setResponsibles, setEvents, setCities } = useDataStore();
+  const { contacts, categories, tags, responsibles, invitationTypes, cities, setContacts, setCategories, setTags, setResponsibles, setInvitationTypes, setCities } = useDataStore();
   const { 
     search, categoryId, tagId, region, sortBy, sortOrder,
     setSearch, setCategoryId, setTagId, setRegion, setSortBy, setSortOrder, resetFilters 
@@ -71,9 +71,9 @@ export default function ContactsPage() {
     position: '',
     previous_workplaces: '',
     category_id: null as number | null,
-    responsible_id: null as number | null,
+    responsible_ids: [] as number[],
     tags: [] as number[],
-    invitation_types: [] as string[],
+    invitation_type_ids: [] as number[],
     postal_address: '',
     region: null as number | null,
     visible_only_to_admin: false,
@@ -93,19 +93,19 @@ export default function ContactsPage() {
 
   const loadData = async () => {
     try {
-      const [contactsRes, categoriesRes, tagsRes, responsiblesRes, eventsRes, citiesRes] = await Promise.all([
+      const [contactsRes, categoriesRes, tagsRes, responsiblesRes, invitationTypesRes, citiesRes] = await Promise.all([
         contactsApi.getAll(),
         categoriesApi.getAll(),
         tagsApi.getAll(),
         responsiblesApi.getAll(),
-        eventsApi.getAll(),
+        invitationTypesApi.getAll(),
         citiesApi.getAll(),
       ]);
       setContacts(contactsRes.data);
       setCategories(categoriesRes.data);
       setTags(tagsRes.data);
       setResponsibles(responsiblesRes.data);
-      setEvents(eventsRes.data);
+      setInvitationTypes(invitationTypesRes.data);
       setCities(citiesRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -130,8 +130,8 @@ export default function ContactsPage() {
     setNewContact({
       first_name: '', middle_name: '', last_name: '', description: '', short_description: '', full_description: '',
       priority_contact: '', phone: '', email: '', social: '', birthday: '', place_of_birth: '',
-      workplace: '', position: '', previous_workplaces: '', category_id: null, responsible_id: null,
-      tags: [], invitation_types: [], postal_address: '', region: null,
+      workplace: '', position: '', previous_workplaces: '', category_id: null, responsible_ids: [],
+      tags: [], invitation_type_ids: [], postal_address: '', region: null,
       visible_only_to_admin: false, visible_only_to_editor: false, gifts_given: '', is_priest: false,
     });
   };
@@ -157,9 +157,9 @@ export default function ContactsPage() {
         position: newContact.position || undefined,
         previous_workplaces: newContact.previous_workplaces || undefined,
         category_id: newContact.category_id || undefined,
-        responsible_id: newContact.responsible_id || undefined,
+        responsible_ids: newContact.responsible_ids.length > 0 ? newContact.responsible_ids : undefined,
         tags: newContact.tags.length > 0 ? newContact.tags : undefined,
-        invitation_types: newContact.invitation_types.length > 0 ? newContact.invitation_types : undefined,
+        invitation_types: newContact.invitation_type_ids.length > 0 ? newContact.invitation_type_ids : undefined,
         postal_address: newContact.postal_address || undefined,
         region: newContact.region || undefined,
         gifts_given: newContact.gifts_given || undefined,
@@ -572,7 +572,7 @@ export default function ContactsPage() {
                       ) : '-'}
                     </td>
                     <td style={{ padding: '1rem', borderBottom: '1px solid #e5e7eb' }}>
-                      {contact.responsible?.name || '-'}
+                      {contact.responsibles?.length ? contact.responsibles.map(r => r.name).join(', ') : '-'}
                     </td>
                   </tr>
                 ))
@@ -878,17 +878,24 @@ export default function ContactsPage() {
                 <h3 style={{ fontSize: '0.875rem', fontWeight: 'bold', marginBottom: '1rem', color: '#f59e0b' }}>4. Взаимодействие</h3>
                 <div style={{ display: 'grid', gap: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Кто ответственный</label>
-                    <select
-                      value={newContact.responsible_id || ''}
-                      onChange={(e) => setNewContact({ ...newContact, responsible_id: e.target.value ? Number(e.target.value) : null })}
-                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
-                    >
-                      <option value="">Не выбрано</option>
+                    <label style={{ display: 'block', marginBottom: '0.5rem' }}>Кто ответственный</label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                       {responsibles.map(r => (
-                        <option key={r.id} value={r.id}>{r.name}</option>
+                        <label key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={newContact.responsible_ids.includes(r.id)}
+                            onChange={(e) => {
+                              const selected = e.target.checked
+                                ? [...newContact.responsible_ids, r.id]
+                                : newContact.responsible_ids.filter(id => id !== r.id);
+                              setNewContact({ ...newContact, responsible_ids: selected });
+                            }}
+                          />
+                          <span style={{ fontSize: '0.875rem' }}>{r.name}</span>
+                        </label>
                       ))}
-                    </select>
+                    </div>
                   </div>
 
                   <div>
@@ -905,19 +912,19 @@ export default function ContactsPage() {
                   <div>
                     <label style={{ display: 'block', marginBottom: '0.5rem' }}>Куда приглашать</label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {events.map(event => (
-                        <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                      {(invitationTypes || []).map(type => (
+                        <label key={type.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
                           <input
                             type="checkbox"
-                            checked={newContact.invitation_types.includes(event.title)}
+                            checked={newContact.invitation_type_ids.includes(type.id)}
                             onChange={(e) => {
                               const selected = e.target.checked
-                                ? [...newContact.invitation_types, event.title]
-                                : newContact.invitation_types.filter(t => t !== event.title);
-                              setNewContact({ ...newContact, invitation_types: selected });
+                                ? [...newContact.invitation_type_ids, type.id]
+                                : newContact.invitation_type_ids.filter(id => id !== type.id);
+                              setNewContact({ ...newContact, invitation_type_ids: selected });
                             }}
                           />
-                          <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                          <span style={{ fontSize: '0.875rem' }}>{type.name}</span>
                         </label>
                       ))}
                     </div>

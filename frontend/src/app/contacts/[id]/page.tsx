@@ -36,13 +36,12 @@ interface Contact {
   workplace?: string;
   position?: string;
   previous_workplaces?: string;
-  responsible_id?: number;
+  responsible_ids?: number[];
   category_id?: number;
   category?: { id: number; name: string; color: string };
-  responsible?: { id: number; name: string };
+  responsibles?: { id: number; name: string }[];
   tags?: { id: number; name: string; color: string }[];
-  invitation_types?: string[];
-  required_invitations?: string[];
+  invitation_type_ids?: number[];
   postal_address?: string;
   region?: number | string;
   visible_only_to_admin?: boolean;
@@ -84,7 +83,6 @@ export default function ContactDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState<any>({});
-  const [allEvents, setAllEvents] = useState<any[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -96,12 +94,11 @@ export default function ContactDetailPage() {
 
   const loadData = async () => {
     try {
-      const [contactRes, categoriesRes, tagsRes, eventsRes, allEventsRes, typesRes, citiesRes, responsiblesRes] = await Promise.all([
+      const [contactRes, categoriesRes, tagsRes, eventsRes, typesRes, citiesRes, responsiblesRes] = await Promise.all([
         contactsApi.getOne(Number(params.id)),
         categoriesApi.getAll(),
         tagsApi.getAll(),
         eventsApi.getAll({ contact_id: String(params.id) }),
-        eventsApi.getAll(),
         invitationTypesApi.getAll(),
         citiesApi.getAll(),
         responsiblesApi.getAll(),
@@ -110,17 +107,14 @@ export default function ContactDetailPage() {
       setFormData({
         ...contactRes.data,
         tags: contactRes.data.tags?.map((t: any) => t.id) || [],
-        invitation_types: typeof contactRes.data.invitation_types === 'string'
-          ? contactRes.data.invitation_types.split(',').filter(Boolean)
-          : (contactRes.data.invitation_types || []),
-        required_invitations: typeof contactRes.data.required_invitations === 'string'
-          ? contactRes.data.required_invitations.split(',').filter(Boolean)
-          : (contactRes.data.required_invitations || []),
+        invitation_type_ids: typeof contactRes.data.invitation_types === 'string'
+          ? contactRes.data.invitation_types.split(',').filter(Boolean).map(Number)
+          : (contactRes.data.invitation_type_ids || []),
+        responsible_ids: contactRes.data.responsibles?.map((r: any) => r.id) || [],
       });
       setCategories(categoriesRes.data);
       setTags(tagsRes.data);
       setEvents(eventsRes.data);
-      setAllEvents(allEventsRes.data);
       setInvitationTypes(typesRes.data);
       setCities(citiesRes.data);
       setResponsibles(responsiblesRes.data);
@@ -143,8 +137,8 @@ export default function ContactDetailPage() {
     try {
       const dataToSend = {
         ...formData,
-        invitation_types: Array.isArray(formData.invitation_types) ? formData.invitation_types : [],
-        required_invitations: Array.isArray(formData.required_invitations) ? formData.required_invitations : [],
+        invitation_types: Array.isArray(formData.invitation_type_ids) ? formData.invitation_type_ids : [],
+        responsible_ids: Array.isArray(formData.responsible_ids) ? formData.responsible_ids : [],
         tags: Array.isArray(formData.tags) ? formData.tags : [],
       };
       await contactsApi.update(Number(params.id), dataToSend);
@@ -433,15 +427,15 @@ export default function ContactDetailPage() {
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Куда приглашать</label>
                   {editing ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {allEvents.map(event => (
-                        <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={(formData.invitation_types as string[] || []).includes(event.title)} onChange={(e) => { const current = formData.invitation_types as string[] || []; const selected = e.target.checked ? [...current, event.title] : current.filter(t => t !== event.title); setFormData({ ...formData, invitation_types: selected }); }} />
-                          <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                      {invitationTypes.map(type => (
+                        <label key={type.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={(formData.invitation_type_ids as number[] || []).includes(type.id)} onChange={(e) => { const current = formData.invitation_type_ids as number[] || []; const selected = e.target.checked ? [...current, type.id] : current.filter(id => id !== type.id); setFormData({ ...formData, invitation_type_ids: selected }); }} />
+                          <span style={{ fontSize: '0.875rem' }}>{type.name}</span>
                         </label>
                       ))}
                     </div>
                   ) : (
-                    <div>{safeJoin(contact.invitation_types)}</div>
+                    <div>{invitationTypes.filter(t => (contact.invitation_type_ids as number[] || []).includes(t.id)).map(t => t.name).join(', ') || '-'}</div>
                   )}
                 </div>
               </div>
@@ -449,27 +443,16 @@ export default function ContactDetailPage() {
                 <div style={{ marginBottom: '1.5rem' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Кто ответственный</label>
                   {editing ? (
-                    <select value={formData.responsible_id || ''} onChange={(e) => setFormData({ ...formData, responsible_id: e.target.value ? Number(e.target.value) : null })} style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-                      <option value="">Не выбран</option>
-                      {responsibles.map(r => (<option key={r.id} value={r.id}>{r.name}</option>))}
-                    </select>
-                  ) : (
-                    <div>{contact.responsible?.name || '-'}</div>
-                  )}
-                </div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Обязательные приглашения</label>
-                  {editing ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {allEvents.map(event => (
-                        <label key={event.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={(formData.required_invitations as string[] || []).includes(event.title)} onChange={(e) => { const current = formData.required_invitations as string[] || []; const selected = e.target.checked ? [...current, event.title] : current.filter(t => t !== event.title); setFormData({ ...formData, required_invitations: selected }); }} />
-                          <span style={{ fontSize: '0.875rem' }}>{event.title}</span>
+                      {responsibles.map(r => (
+                        <label key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={(formData.responsible_ids as number[] || []).includes(r.id)} onChange={(e) => { const current = formData.responsible_ids as number[] || []; const selected = e.target.checked ? [...current, r.id] : current.filter(id => id !== r.id); setFormData({ ...formData, responsible_ids: selected }); }} />
+                          <span style={{ fontSize: '0.875rem' }}>{r.name}</span>
                         </label>
                       ))}
                     </div>
                   ) : (
-                    <div>{safeJoin(contact.required_invitations)}</div>
+                    <div>{contact.responsibles?.map(r => r.name).join(', ') || '-'}</div>
                   )}
                 </div>
               </div>

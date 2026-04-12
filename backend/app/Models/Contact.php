@@ -43,6 +43,11 @@ class Contact extends Model
         return $this->belongsTo(Responsible::class);
     }
 
+    public function responsibles()
+    {
+        return $this->belongsToMany(Responsible::class, 'contact_responsible');
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);

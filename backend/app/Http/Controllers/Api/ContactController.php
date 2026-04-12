@@ -12,7 +12,7 @@ class ContactController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = Contact::with(['category', 'responsible', 'tags']);
+        $query = Contact::with(['category', 'responsibles', 'tags']);
 
         if ($user->role !== 'admin') {
             $query->where('visible_only_to_admin', false);
@@ -87,6 +87,8 @@ class ContactController extends Controller
             'position' => 'nullable|string|max:255',
             'previous_workplaces' => 'nullable|string',
             'responsible_id' => 'nullable|exists:responsibles,id',
+            'responsible_ids' => 'nullable|array',
+            'responsible_ids.*' => 'exists:responsibles,id',
             'category_id' => 'nullable|exists:categories,id',
             'invitation_types' => 'nullable|array',
             'postal_address' => 'nullable|string',
@@ -118,7 +120,11 @@ class ContactController extends Controller
             $contact->tags()->sync($request->tags);
         }
 
-        $contact->load(['category', 'responsible', 'tags']);
+        if ($request->has('responsible_ids')) {
+            $contact->responsibles()->sync($request->responsible_ids);
+        }
+
+        $contact->load(['category', 'responsibles', 'tags']);
 
         return response()->json($contact, 201);
     }
@@ -135,7 +141,7 @@ class ContactController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         
-        $contact->load(['category', 'responsible', 'tags', 'events', 'gifts']);
+        $contact->load(['category', 'responsibles', 'tags', 'events', 'gifts']);
 
         return response()->json($contact);
     }
@@ -169,6 +175,8 @@ class ContactController extends Controller
             'position' => 'nullable|string|max:255',
             'previous_workplaces' => 'nullable|string',
             'responsible_id' => 'nullable|exists:responsibles,id',
+            'responsible_ids' => 'nullable|array',
+            'responsible_ids.*' => 'exists:responsibles,id',
             'category_id' => 'nullable|exists:categories,id',
             'invitation_types' => 'nullable|array',
             'postal_address' => 'nullable|string',
@@ -199,7 +207,11 @@ class ContactController extends Controller
             $contact->tags()->sync($request->tags);
         }
 
-        $contact->load(['category', 'responsible', 'tags']);
+        if ($request->has('responsible_ids')) {
+            $contact->responsibles()->sync($request->responsible_ids);
+        }
+
+        $contact->load(['category', 'responsibles', 'tags']);
 
         return response()->json($contact);
     }
