@@ -660,6 +660,35 @@ export default function ContactsPage() {
                     </div>
                   </div>
 
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.5rem',
+                      background: newContact.is_priest ? '#8b5cf6' : '#f3f4f6',
+                      color: newContact.is_priest ? 'white' : '#6b7280',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      border: newContact.is_priest ? '2px solid #7c3aed' : '2px solid transparent'
+                    }}
+                    onClick={() => setNewContact({ ...newContact, is_priest: !newContact.is_priest })}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={newContact.is_priest}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setNewContact({ ...newContact, is_priest: e.target.checked });
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                      <span style={{ fontSize: '1.5rem' }}>🙏</span>
+                      <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>Священник</span>
+                    </div>
+                  </div>
+
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
                       <label style={{ display: 'block', marginBottom: '0.25rem' }}>Дата рождения</label>
@@ -708,17 +737,6 @@ export default function ContactsPage() {
                         </label>
                       ))}
                     </div>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={newContact.is_priest}
-                        onChange={(e) => setNewContact({ ...newContact, is_priest: e.target.checked })}
-                      />
-                      <span style={{ fontSize: '0.875rem' }}>Священник</span>
-                    </label>
                   </div>
 
                   {user?.role === 'admin' && (

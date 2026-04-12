@@ -239,10 +239,32 @@ export default function ContactDetailPage() {
 
               {editing && (
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input type="checkbox" checked={formData.is_priest || false} onChange={(e) => setFormData({ ...formData, is_priest: e.target.checked })} />
-                    <span>Священник</span>
-                  </label>
+                  <div style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem',
+                    background: formData.is_priest ? '#8b5cf6' : '#f3f4f6',
+                    color: formData.is_priest ? 'white' : '#6b7280',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    border: formData.is_priest ? '2px solid #7c3aed' : '2px solid transparent'
+                  }}
+                  onClick={() => setFormData({ ...formData, is_priest: !formData.is_priest })}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.is_priest || false}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        setFormData({ ...formData, is_priest: e.target.checked });
+                      }}
+                      style={{ display: 'none' }}
+                    />
+                    <span style={{ fontSize: '1.5rem' }}>🙏</span>
+                    <span style={{ fontWeight: '600', fontSize: '0.875rem' }}>Священник</span>
+                  </div>
                 </div>
               )}
 
