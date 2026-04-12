@@ -10,7 +10,11 @@ class ResponsibleController extends Controller
 {
     public function index()
     {
-        $responsibles = Responsible::orderBy('name')->get();
+        $responsibles = Responsible::select('responsibles.*')
+            ->selectRaw('(SELECT COUNT(*) FROM contact_responsible WHERE responsible_id = responsibles.id) as usage_count')
+            ->orderByDesc('usage_count')
+            ->orderBy('name')
+            ->get();
         return response()->json($responsibles);
     }
 

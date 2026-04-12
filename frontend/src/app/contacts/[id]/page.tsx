@@ -83,6 +83,7 @@ export default function ContactDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState<any>({});
+  const [showResponsiblesPopover, setShowResponsiblesPopover] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -91,6 +92,16 @@ export default function ContactDetailPage() {
     }
     loadData();
   }, [isAuthenticated, params.id]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (showResponsiblesPopover && !(e.target as Element).closest('.responsibles-popover')) {
+        setShowResponsiblesPopover(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showResponsiblesPopover]);
 
   const loadData = async () => {
     try {
@@ -465,13 +476,55 @@ export default function ContactDetailPage() {
                 <div style={{ marginBottom: '1.5rem' }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Кто ответственный</label>
                   {editing ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {responsibles.map(r => (
-                        <label key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                          <input type="checkbox" checked={(formData.responsible_ids as number[] || []).includes(r.id)} onChange={(e) => { const current = formData.responsible_ids as number[] || []; const selected = e.target.checked ? [...current, r.id] : current.filter(id => id !== r.id); setFormData({ ...formData, responsible_ids: selected }); }} />
-                          <span style={{ fontSize: '0.875rem' }}>{r.name}</span>
-                        </label>
-                      ))}
+                    <div className="responsibles-popover" style={{ position: 'relative' }}>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setShowResponsiblesPopover(!showResponsiblesPopover); }}
+                        style={{
+                          width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #ddd', 
+                          borderRadius: '4px', background: 'white', textAlign: 'left',
+                          cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        <span style={{ color: (formData.responsible_ids as number[] || []).length === 0 ? '#9ca3af' : '#111' }}>
+                          {(formData.responsible_ids as number[] || []).length === 0 
+                            ? 'Не выбрано' 
+                            : responsibles.filter(r => (formData.responsible_ids as number[] || []).includes(r.id)).map(r => r.name).join(', ')}
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>▼</span>
+                      </button>
+                      
+                      {showResponsiblesPopover && (
+                        <div style={{
+                          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                          background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)', padding: '0.5rem', 
+                          maxHeight: '250px', overflowY: 'auto', marginTop: '0.25rem'
+                        }}>
+                          {responsibles.map(r => (
+                            <label key={r.id} style={{ 
+                              display: 'flex', alignItems: 'center', gap: '0.5rem', 
+                              padding: '0.5rem', cursor: 'pointer', borderRadius: '4px',
+                              transition: 'background 0.15s'
+                            }}
+                            onMouseEnter={(e) => (e.target as HTMLElement).style.background = '#f3f4f6'}
+                            onMouseLeave={(e) => (e.target as HTMLElement).style.background = 'transparent'}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={(formData.responsible_ids as number[] || []).includes(r.id)}
+                                onChange={(e) => { 
+                                  const current = formData.responsible_ids as number[] || []; 
+                                  const selected = e.target.checked ? [...current, r.id] : current.filter(id => id !== r.id); 
+                                  setFormData({ ...formData, responsible_ids: selected }); 
+                                }}
+                              />
+                              <span style={{ fontSize: '0.875rem' }}>{r.name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div>{contact.responsibles?.map(r => r.name).join(', ') || '-'}</div>

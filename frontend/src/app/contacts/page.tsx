@@ -54,6 +54,7 @@ export default function ContactsPage() {
   } = useFilterStore();
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showResponsiblesPopover, setShowResponsiblesPopover] = useState(false);
   const [newContact, setNewContact] = useState({
     first_name: '',
     middle_name: '',
@@ -90,6 +91,16 @@ export default function ContactsPage() {
     }
     loadData();
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (showResponsiblesPopover && !(e.target as Element).closest('.responsibles-popover')) {
+        setShowResponsiblesPopover(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showResponsiblesPopover]);
 
   const loadData = async () => {
     try {
@@ -897,22 +908,56 @@ export default function ContactsPage() {
                 <div style={{ display: 'grid', gap: '1rem' }}>
                   <div>
                     <label style={{ display: 'block', marginBottom: '0.5rem' }}>Кто ответственный</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {responsibles.map(r => (
-                        <label key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                          <input
-                            type="checkbox"
-                            checked={newContact.responsible_ids.includes(r.id)}
-                            onChange={(e) => {
-                              const selected = e.target.checked
-                                ? [...newContact.responsible_ids, r.id]
-                                : newContact.responsible_ids.filter(id => id !== r.id);
-                              setNewContact({ ...newContact, responsible_ids: selected });
+                    <div className="responsibles-popover" style={{ position: 'relative' }}>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setShowResponsiblesPopover(!showResponsiblesPopover); }}
+                        style={{
+                          width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #ddd', 
+                          borderRadius: '4px', background: 'white', textAlign: 'left',
+                          cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        <span style={{ color: newContact.responsible_ids.length === 0 ? '#9ca3af' : '#111' }}>
+                          {newContact.responsible_ids.length === 0 
+                            ? 'Не выбрано' 
+                            : responsibles.filter(r => newContact.responsible_ids.includes(r.id)).map(r => r.name).join(', ')}
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>▼</span>
+                      </button>
+                      
+                      {showResponsiblesPopover && (
+                        <div style={{
+                          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                          background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)', padding: '0.5rem', 
+                          maxHeight: '250px', overflowY: 'auto', marginTop: '0.25rem'
+                        }}>
+                          {responsibles.map(r => (
+                            <label key={r.id} style={{ 
+                              display: 'flex', alignItems: 'center', gap: '0.5rem', 
+                              padding: '0.5rem', cursor: 'pointer', borderRadius: '4px',
+                              transition: 'background 0.15s'
                             }}
-                          />
-                          <span style={{ fontSize: '0.875rem' }}>{r.name}</span>
-                        </label>
-                      ))}
+                            onMouseEnter={(e) => (e.target as HTMLElement).style.background = '#f3f4f6'}
+                            onMouseLeave={(e) => (e.target as HTMLElement).style.background = 'transparent'}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={newContact.responsible_ids.includes(r.id)}
+                                onChange={(e) => {
+                                  const selected = e.target.checked
+                                    ? [...newContact.responsible_ids, r.id]
+                                    : newContact.responsible_ids.filter(id => id !== r.id);
+                                  setNewContact({ ...newContact, responsible_ids: selected });
+                                }}
+                              />
+                              <span style={{ fontSize: '0.875rem' }}>{r.name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
