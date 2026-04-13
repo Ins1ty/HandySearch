@@ -142,7 +142,7 @@ export default function ContactsPage() {
   const resetForm = () => {
     setNewContact({
       first_name: '', middle_name: '', last_name: '', description: '', short_description: '', full_description: '',
-      priority_contact: '', phone: '', email: '', social: '', birthday: '', place_of_birth: '',
+      priority_contact: '', phone: '', phone_2: '', phone_3: '', email: '', social: '', birthday: '', place_of_birth: '',
       workplace: '', position: '', previous_workplaces: '', category_id: null, responsible_ids: [],
       tags: [], invitation_type_ids: [], postal_address: '', region: null,
       visible_only_to_admin: false, visible_only_to_editor: false, gifts_given: '', is_priest: false,
