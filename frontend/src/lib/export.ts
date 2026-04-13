@@ -1,38 +1,5 @@
 import * as XLSX from 'xlsx';
 
-interface Contact {
-  id: number;
-  first_name: string;
-  middle_name?: string;
-  last_name?: string;
-  description?: string;
-  short_description?: string;
-  full_description?: string;
-  priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
-  phone?: string;
-  email?: string;
-  social?: string;
-  birthday?: string;
-  place_of_birth?: string;
-  workplace?: string;
-  position?: string;
-  previous_workplaces?: string;
-  responsible_id?: number;
-  category_id?: number;
-  category?: { id: number; name: string; color: string };
-  responsible?: { id: number; name: string; phone?: string; email?: string };
-  tags?: { id: number; name: string; color: string }[];
-  invitation_types?: string[];
-  required_invitations?: string[];
-  gifts_given?: string;
-  postal_address?: string;
-  region?: string;
-  visible_only_to_admin?: boolean;
-  visible_only_to_editor?: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
 const priorityLabels: Record<string, string> = {
   call: 'Звонок',
   sms: 'СМС',
@@ -48,26 +15,44 @@ export function exportContactsToExcel(contacts: any[], cities: { id: number; nam
     return String(arr);
   };
 
+  const getName = (contact: any): string => {
+    const parts = [contact.first_name || ''];
+    if (contact.middle_name) parts.push(contact.middle_name);
+    if (contact.last_name) parts.push(contact.last_name);
+    const fullName = parts.join(' ');
+    return contact.is_priest ? `Отец ${fullName}` : fullName;
+  };
+
+  const getPhones = (contact: any): string => {
+    const phones = [];
+    if (contact.phone) phones.push(contact.phone);
+    if (contact.phone_2) phones.push(contact.phone_2);
+    if (contact.phone_3) phones.push(contact.phone_3);
+    return phones.join('; ');
+  };
+
   const data = contacts.map((contact: any) => ({
-    'Имя': contact.first_name || '',
+    'Имя': getName(contact),
     'Отчество': contact.middle_name || '',
     'Фамилия': contact.last_name || '',
     'Дата рождения': contact.birthday ? new Date(contact.birthday).toLocaleDateString('ru-RU') : '',
     'Место рождения': contact.place_of_birth || '',
-    'Категория': contact.category?.name || '',
     'Теги': safeJoin(contact.tags?.map ? contact.tags.map((t: any) => t.name) : contact.tags),
+    'Телефоны': getPhones(contact),
+    'Email': contact.email || '',
+    'Город': contact.region ? String(cities.find(c => c.id === Number(contact.region))?.name || '') : '',
+    'Почтовый адрес': contact.postal_address || '',
+    'Соцсети / Мессенджеры': contact.social || '',
     'Приоритетная связь': contact.priority_contact ? priorityLabels[contact.priority_contact] || '' : '',
     'Место работы/служения': contact.workplace || '',
     'Должность/деятельность': contact.position || '',
     'Прошлые места службы': contact.previous_workplaces || '',
+    'Категория': contact.category?.name || '',
+    'Кто ответственный': contact.responsibles?.map((r: any) => r.name).join(', ') || '',
+    'Что дарили': contact.gifts_given || '',
+    'Куда приглашать': safeJoin(contact.invitation_type_ids),
     'Краткое описание': contact.short_description || '',
     'Подробное описание': contact.full_description || '',
-    'Что дарили': contact.gifts_given || '',
-    'Куда приглашать': safeJoin(contact.invitation_types),
-    'Кто ответственный': contact.responsible?.name || '',
-    'Обязательные приглашения': safeJoin(contact.required_invitations),
-    'Регион': contact.region ? String(cities.find(c => c.id === Number(contact.region))?.name || '') : '',
-    'Дата создания': contact.created_at ? new Date(contact.created_at).toLocaleDateString('ru-RU') : '',
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(data);
@@ -76,29 +61,27 @@ export function exportContactsToExcel(contacts: any[], cities: { id: number; nam
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Контакты');
 
   const colWidths = [
-    { wch: 15 },
-    { wch: 15 },
-    { wch: 15 },
-    { wch: 12 },
-    { wch: 20 },
-    { wch: 15 },
-    { wch: 20 },
-    { wch: 20 },
     { wch: 25 },
-    { wch: 30 },
-    { wch: 20 },
+    { wch: 15 },
+    { wch: 15 },
     { wch: 12 },
+    { wch: 20 },
+    { wch: 20 },
+    { wch: 30 },
+    { wch: 25 },
+    { wch: 15 },
+    { wch: 30 },
+    { wch: 25 },
+    { wch: 15 },
+    { wch: 25 },
+    { wch: 20 },
+    { wch: 30 },
+    { wch: 15 },
     { wch: 25 },
     { wch: 25 },
     { wch: 25 },
     { wch: 30 },
     { wch: 40 },
-    { wch: 25 },
-    { wch: 25 },
-    { wch: 20 },
-    { wch: 25 },
-    { wch: 15 },
-    { wch: 12 },
   ];
   worksheet['!cols'] = colWidths;
 

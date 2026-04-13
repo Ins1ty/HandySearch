@@ -16,6 +16,8 @@ class Contact extends Model
         'full_description',
         'priority_contact',
         'phone',
+        'phone_2',
+        'phone_3',
         'email',
         'social',
         'birthday',

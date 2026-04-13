@@ -29,6 +29,8 @@ interface Contact {
   full_description?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
+  phone_2?: string;
+  phone_3?: string;
   email?: string;
   social?: string;
   birthday?: string;
@@ -330,11 +332,29 @@ export default function ContactDetailPage() {
 
             <div>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Телефон</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Мобильный 1</label>
                 {editing ? (
-                  <input type="tel" value={formData.phone || ''} onChange={(e) => setFormData({ ...formData, phone: formatPhone(e.target.value) })} placeholder="+7 (___) ___-__-__" style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input type="tel" value={formData.phone || ''} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} onBlur={(e) => setFormData({ ...formData, phone: formatPhone(e.target.value) })} placeholder="+7 (___) ___-__-__" style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
                 ) : (
                   <div>{contact.phone || '-'}</div>
+                )}
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Мобильный 2</label>
+                {editing ? (
+                  <input type="tel" value={formData.phone_2 || ''} onChange={(e) => setFormData({ ...formData, phone_2: e.target.value })} onBlur={(e) => setFormData({ ...formData, phone_2: formatPhone(e.target.value) })} placeholder="+7 (___) ___-__-__" style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
+                ) : (
+                  <div>{contact.phone_2 || '-'}</div>
+                )}
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Доп. телефон</label>
+                {editing ? (
+                  <input type="text" value={formData.phone_3 || ''} onChange={(e) => setFormData({ ...formData, phone_3: e.target.value })} placeholder="Любой формат" style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }} />
+                ) : (
+                  <div>{contact.phone_3 || '-'}</div>
                 )}
               </div>
 

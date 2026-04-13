@@ -51,6 +51,8 @@ interface Contact {
   full_description?: string;
   priority_contact?: 'call' | 'sms' | 'messenger' | 'email';
   phone?: string;
+  phone_2?: string;
+  phone_3?: string;
   email?: string;
   social?: string;
   birthday?: string;

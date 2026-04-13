@@ -64,6 +64,8 @@ export default function ContactsPage() {
     full_description: '',
     priority_contact: '' as '' | 'call' | 'sms' | 'messenger' | 'email',
     phone: '',
+    phone_2: '',
+    phone_3: '',
     email: '',
     social: '',
     birthday: '',
@@ -160,6 +162,8 @@ export default function ContactsPage() {
         full_description: newContact.full_description || undefined,
         priority_contact: newContact.priority_contact || undefined,
         phone: newContact.phone || undefined,
+        phone_2: newContact.phone_2 || undefined,
+        phone_3: newContact.phone_3 || undefined,
         email: newContact.email || undefined,
         social: newContact.social || undefined,
         birthday: newContact.birthday || undefined,
@@ -777,26 +781,49 @@ export default function ContactsPage() {
               <div style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '1.5rem' }}>
                 <h3 style={{ fontSize: '0.875rem', fontWeight: 'bold', marginBottom: '1rem', color: '#3b82f6' }}>2. Контакты</h3>
                 <div style={{ display: 'grid', gap: '1rem' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Телефон</label>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Мобильный 1</label>
                       <input
                         type="tel"
                         value={newContact.phone}
-                        onChange={(e) => setNewContact({ ...newContact, phone: formatPhone(e.target.value) })}
+                        onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+                        onBlur={(e) => setNewContact({ ...newContact, phone: formatPhone(e.target.value) })}
                         placeholder="+7 (___) ___-__-__"
                         style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Email</label>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Мобильный 2</label>
                       <input
-                        type="email"
-                        value={newContact.email}
-                        onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+                        type="tel"
+                        value={newContact.phone_2}
+                        onChange={(e) => setNewContact({ ...newContact, phone_2: e.target.value })}
+                        onBlur={(e) => setNewContact({ ...newContact, phone_2: formatPhone(e.target.value) })}
+                        placeholder="+7 (___) ___-__-__"
                         style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
                       />
                     </div>
+                    <div>
+                      <label style={{ display: 'block', marginBottom: '0.25rem' }}>Доп. телефон</label>
+                      <input
+                        type="text"
+                        value={newContact.phone_3}
+                        onChange={(e) => setNewContact({ ...newContact, phone_3: e.target.value })}
+                        placeholder="Любой формат"
+                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem' }}>Email</label>
+                    <input
+                      type="email"
+                      value={newContact.email}
+                      onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}
+                    />
                   </div>
 
                   <div>
